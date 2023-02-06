@@ -13,8 +13,9 @@ protected:
 	const string* name;
 public:
 	string getName();
-	virtual void UpdateState() = 0;
+	//virtual void UpdateState() = 0;
 	virtual State* Transition(string command) = 0;
+	State* invalidCommmand();
 };
 
 /*
@@ -28,7 +29,7 @@ private:
 	const string* transition;
 public:
 	StateStart();
-	void UpdateState();
+	//void UpdateState();
 	State* Transition(string command);
 };
 
@@ -37,9 +38,13 @@ public:
 * Description: State where the user chooses to load a map
 */
 class StateMapLoad : public State {
+private:
+	~StateMapLoad();
+	const string* transitionLoad;
+	const string* transitionValidate;
 public:
 	StateMapLoad();
-	void UpdateState();
+	//void UpdateState();
 	State* Transition(string command);
 };
 
@@ -49,9 +54,12 @@ public:
 *			   the map chosen by the user.
 */
 class StateMapValidate : public State {
+private:
+	~StateMapValidate();
+	const string* transition;
 public:
 	StateMapValidate();
-	void UpdateState();
+	//void UpdateState();
 	State* Transition(string command);
 };
 
@@ -61,9 +69,13 @@ public:
 *			   This is the last state before the game begins.
 */
 class StateAddPlayers : public State {
+private:
+	~StateAddPlayers();
+	const string* transitionAdd;
+	const string* transitionPlay;
 public:
 	StateAddPlayers();
-	void UpdateState();
+	//void UpdateState();
 	State* Transition(string command);
 };
 
