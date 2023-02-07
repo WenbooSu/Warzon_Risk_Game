@@ -113,7 +113,114 @@ State* StateAddPlayers::Transition(string command){
 		return new StateAddPlayers();
 	}
 	else if (command.compare(*this->transitionPlay) == 0) {
+		return new StateAssign();
+	}
+	else {
+		return this->invalidCommmand();
+	}
+}
+
+/************************************
+  Assign Reinforcements State Class
+************************************/
+StateAssign::StateAssign() {
+	this->name = new string("Assign Reinforcement");
+	this->transition = new string("issueorder");
+}
+
+StateAssign::~StateAssign() {
+	delete this->name;
+	delete this->transition;
+}
+
+State* StateAssign::Transition(string command) {
+	if (command.compare(*this->transition) == 0) {
+		return new StateIssueOrders();
+	}
+	else {
+		return this->invalidCommmand();
+	}
+}
+
+/*******************************
+	Issue Orders State Class
+*******************************/
+StateIssueOrders::StateIssueOrders() {
+	this->name = new string("Issue Orders");
+	this->transitionIssueOrder = new string("issueorder");
+	this->transitionExecuteOrder = new string("endissueorders");
+}
+StateIssueOrders::~StateIssueOrders() {
+	delete this->name;
+	delete this->transitionIssueOrder;
+	delete this->transitionExecuteOrder;
+}
+
+State* StateIssueOrders::Transition(string command) {
+	if (command.compare(*this->transitionIssueOrder) == 0) {
+		return new StateIssueOrders();
+	}
+	else if (command.compare(*this->transitionExecuteOrder) == 0) {
+		return new StateExecuteOrders();
+	}
+	else {
+		return this->invalidCommmand();
+	}
+}
+
+/*********************************
+	Execute Orders State Class
+*********************************/
+StateExecuteOrders::StateExecuteOrders() {
+	this->name = new string("Execute Orders");
+	this->transitionExecuteOrder = new string("execorder");
+	this->transitionEndOrders = new string("endexecorders");
+	this->transitionWin = new string("win");
+}
+
+StateExecuteOrders::~StateExecuteOrders() {
+	delete this->name;
+	delete this->transitionExecuteOrder;
+	delete this->transitionEndOrders;
+	delete this->transitionWin;
+}
+
+State* StateExecuteOrders::Transition(string command) {
+	if (command.compare(*this->transitionExecuteOrder) == 0) {
+		return new StateExecuteOrders();
+	}
+	else if (command.compare(*this->transitionEndOrders) == 0) {
+		return new StateAssign();
+	}
+	else if (command.compare(*this->transitionWin) == 0) {
+		return new StateWin();
+	}
+	else {
+		return this->invalidCommmand();
+	}
+}
+
+/*******************************
+		Win State Class
+*******************************/
+StateWin::StateWin() {
+	this->name = new string("win");
+	this->transitionEnd = new string("end");
+	this->transitionRestart = new string("play");
+}
+
+StateWin::~StateWin() {
+	delete this->name;
+	delete this->transitionEnd;
+	delete this->transitionRestart;
+}
+
+State* StateWin::Transition(string command) {
+	if (command.compare(*this->transitionEnd) == 0) {
 		return nullptr;
+	}
+	else if (command.compare(*this->transitionRestart) == 0) {
+		return new StateStart();
 	}
 	else {
 		return this->invalidCommmand();
@@ -123,19 +230,19 @@ State* StateAddPlayers::Transition(string command){
 /*******************************
 		Engine Class
 *******************************/
-Engine::Engine() {
+GameEngine::GameEngine() {
 	currentState = new StateStart();
 }
 
-Engine::~Engine() {
+GameEngine::~GameEngine() {
 	delete currentState;
 }
 
-State* Engine::getState() {
-	return this->currentState;
+string GameEngine::getStateName() {
+	return this->currentState->getName();
 }
 
-void Engine::ChangeState(string command) {
+void GameEngine::ChangeState(string command) {
 	//Get the next state from the current state based on user input.
 	State * s = this->currentState->Transition(command);
 	if (s != NULL) {

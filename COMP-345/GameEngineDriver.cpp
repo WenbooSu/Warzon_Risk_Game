@@ -3,13 +3,14 @@
 using namespace std;
 
 int main() {
-	Engine engine;
+	GameEngine engine;
 	string command;
 	//The main game loop. Continues endlessly, for now.
-	while (true){
+	//REMOVE MAGIC NUMBERS
+	while (command != "end" || engine.getStateName() != "win") {
 		cout << "Game Engine Driver." <<
-		"\n\nCurrent Game State: " << engine.getState()->getName() <<
-		"\nPlease enter your command: " << endl;
+		"\n\nCurrent Game State: " << engine.getStateName() <<
+		"\nPlease enter your command:" << endl;
 		cin >> command;
 		//Before changing state, clear the screen.
 		system("cls");
