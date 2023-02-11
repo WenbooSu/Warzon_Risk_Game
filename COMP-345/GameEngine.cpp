@@ -124,6 +124,7 @@ State* StateAddPlayers::Transition(string command){
   Assign Reinforcements State Class
 ************************************/
 StateAssign::StateAssign() {
+	//Upon instantiation, set name and command to its transition state.
 	this->name = new string("Assign Reinforcement");
 	this->transition = new string("issueorder");
 }
@@ -134,6 +135,7 @@ StateAssign::~StateAssign() {
 }
 
 State* StateAssign::Transition(string command) {
+	//Verify that the command meets transition string, otherwise error.
 	if (command.compare(*this->transition) == 0) {
 		return new StateIssueOrders();
 	}
@@ -146,6 +148,7 @@ State* StateAssign::Transition(string command) {
 	Issue Orders State Class
 *******************************/
 StateIssueOrders::StateIssueOrders() {
+	//Upon instantiation, set name and commands to both transition states.
 	this->name = new string("Issue Orders");
 	this->transitionIssueOrder = new string("issueorder");
 	this->transitionExecuteOrder = new string("endissueorders");
@@ -157,6 +160,7 @@ StateIssueOrders::~StateIssueOrders() {
 }
 
 State* StateIssueOrders::Transition(string command) {
+	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionIssueOrder) == 0) {
 		return new StateIssueOrders();
 	}
@@ -172,6 +176,7 @@ State* StateIssueOrders::Transition(string command) {
 	Execute Orders State Class
 *********************************/
 StateExecuteOrders::StateExecuteOrders() {
+	//Upon instantiation, set name and commands to its transition states.
 	this->name = new string("Execute Orders");
 	this->transitionExecuteOrder = new string("execorder");
 	this->transitionEndOrders = new string("endexecorders");
@@ -186,6 +191,7 @@ StateExecuteOrders::~StateExecuteOrders() {
 }
 
 State* StateExecuteOrders::Transition(string command) {
+	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionExecuteOrder) == 0) {
 		return new StateExecuteOrders();
 	}
@@ -204,7 +210,8 @@ State* StateExecuteOrders::Transition(string command) {
 		Win State Class
 *******************************/
 StateWin::StateWin() {
-	this->name = new string("win");
+	//Upon instantiation, set name and commands to both transition states.
+	this->name = new string("Win");
 	this->transitionEnd = new string("end");
 	this->transitionRestart = new string("play");
 }
@@ -216,6 +223,7 @@ StateWin::~StateWin() {
 }
 
 State* StateWin::Transition(string command) {
+	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionEnd) == 0) {
 		return nullptr;
 	}
@@ -231,11 +239,21 @@ State* StateWin::Transition(string command) {
 		Engine Class
 *******************************/
 GameEngine::GameEngine() {
-	currentState = new StateStart();
+	currentState = new StateWin();
+}
+
+GameEngine::GameEngine(GameEngine& engine) {
+	this->currentState = engine.currentState;
 }
 
 GameEngine::~GameEngine() {
 	delete currentState;
+}
+
+bool GameEngine::isPlaying() {
+	/*Check if the command matches the end game command, and
+	  whether the current state can be converted to win state, if not, the current state is already win state.*/
+	return this->userCommand.compare(*this->commandEnd) != 0 || dynamic_cast<StateWin*>(currentState) == nullptr;
 }
 
 string GameEngine::getStateName() {
@@ -245,8 +263,25 @@ string GameEngine::getStateName() {
 void GameEngine::ChangeState(string command) {
 	//Get the next state from the current state based on user input.
 	State * s = this->currentState->Transition(command);
+	//If a valid State object was returned, delete the curent and replace it with new one.
 	if (s != NULL) {
 		delete currentState;
 		currentState = s;
 	}
+}
+
+bool GameEngine::operator==(GameEngine* engine) {
+	return this->getStateName() == engine->getStateName();
+}
+
+ostream& operator<<(ostream& output, const GameEngine& engine) {
+	output << "Game Engine's current state: " << engine.currentState->getName();
+	return output;
+}
+
+istream& operator>>(istream& input, GameEngine& engine) {
+	cout << "\nPlease enter your command:" << endl;
+	input >> engine.userCommand;
+	engine.ChangeState(engine.userCommand);
+	return input;
 }

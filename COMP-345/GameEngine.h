@@ -11,11 +11,14 @@ using namespace std;
 class State {
 protected:
 	const string* name;
+	/*Default error message output.*/
 	State* invalidCommmand();
 public:
+	/*Return the name of the state.*/
 	string getName();
-	//virtual void UpdateState() = 0;
+	/*Transition to state based on user input.*/
 	virtual State* Transition(string command) = 0;
+	//virtual void UpdateState() = 0;
 };
 
 /*
@@ -120,6 +123,7 @@ public:
 	StateExecuteOrders();
 	State* Transition(string command);
 };
+
 /*
 * Derived class
 * Description: After assigning reinforcements,
@@ -142,11 +146,24 @@ public:
 class GameEngine {
 private:
 	State* currentState;
+	const string* const commandEnd = new string("end");
+	string userCommand;
 
 public:
 	GameEngine();
 	~GameEngine();
-	/*bool isPlaying();*/
+	/*Copy Constructor*/
+	GameEngine(GameEngine& engine);
+	/*Check if the game should continue based on user inputand state.*/
+	bool isPlaying();
+	/*Return the name of the current state*/
 	string getStateName();
+	/*Given user input, change or deny the state transition.*/
 	void ChangeState(string command);
+	/*Compare name of this current state and parameter's.*/
+	bool operator ==(GameEngine* engine);
+	/*Print the engine's current state.*/
+	friend ostream& operator<<(ostream&, const GameEngine&);
+	/*Take input as a command.*/
+	friend istream& operator>>(istream&, GameEngine&);
 };

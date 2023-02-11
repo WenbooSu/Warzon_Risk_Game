@@ -140,10 +140,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="GameEngine.h" />
+    <ClInclude Include="GamEngineDriver.h" />
+    <ClInclude Include="State.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameEngineDriver.cpp" />
+    <ClCompile Include="State.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
