@@ -4,13 +4,13 @@
 #include <string>
 #include Card.h
 #include Orders.h
-using namespace std;
+
 
 class Player
 {
 public: 
     Player();      
-    Player(string name, vector<string*> territoryList, vector<Hand*> hand,vector<Order*> orderList);
+    Player(string name, vector<string*> territoryList, vector<Card*> hand,vector<Order*> orderList);
    
     Player(const Player&); //copy constructor
 
@@ -18,20 +18,25 @@ public:
     void toAttack();
     void issueOrder(string territory);
 
-    string getName() const;
-    vector<string*> getTerritory() const;
-    vector<Hand*> getHand() const;
-    vector<Order*> getOrder() const;
+    string getName();
+    string getTerritory();
+    vector<string*> getTerritoryList();
+    vector<Hand*> getHand();
+    vector<Order*> getOrderList();
 
-    string getName() const;
-    vector<string*> setTerritory() const;
-    vector<Hand*> setHand() const;
-    vector<Order*> setOrder() const;
+    string setName();
+    string setTerritory();
+    vector<string*> setTerritoryList();
+    vector<Hand*> setHand();
+    vector<Order*> setOrderList();
 
-private
+
+
+private:
     string name;
+    string territory;
     vector<string*> territoryList;
-    vector<Hand*> hand;
+    vector<Card*> hand;
     vector<Order*> orderList;
 
 }
