@@ -1,16 +1,18 @@
-
-
 #include <vector>
 #include <string>
+#include<iostream>
+#include MapLoader.h
 #include Card.h
 #include Orders.h
 
+#include MapLoader.h
+using namespace std;
 
 class Player
 {
 public: 
     Player();      
-    Player(string name, vector<string*> territoryList, vector<Card*> hand,vector<Order*> orderList);
+    Player(string name, vector<Territory*> territoryList, vector<Card*> hand,vector<Order*> orderList);
    
     Player(const Player&); //copy constructor
 
@@ -19,14 +21,12 @@ public:
     void issueOrder(string territory);
 
     string getName();
-    string getTerritory();
-    vector<string*> getTerritoryList();
+    vector<Territory*> getTerritoryList();
     vector<Hand*> getHand();
     vector<Order*> getOrderList();
 
     string setName();
-    string setTerritory();
-    vector<string*> setTerritoryList();
+    vector<Territory*> setTerritoryList();
     vector<Hand*> setHand();
     vector<Order*> setOrderList();
 
@@ -34,8 +34,7 @@ public:
 
 private:
     string name;
-    string territory;
-    vector<string*> territoryList;
+    vector<Territory*> territoryList;
     vector<Card*> hand;
     vector<Order*> orderList;
 
