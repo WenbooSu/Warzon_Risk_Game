@@ -148,3 +148,4 @@ public:
 private:
     string enemy; //Player enemy;
 };
+
