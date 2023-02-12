@@ -12,22 +12,23 @@
 using namespace std;
 
 //--Orders--
-Order::Order() : player("Default Player")
+Order::Order() : player("Default Player"), if_executed(false)
 {
 }
 
-Order::Order(string thePlayer) : player(thePlayer)
+Order::Order(string thePlayer, bool if_executed) : player(thePlayer), if_executed(false)
 {
 }
 
 Order::~Order()
 {
-    
+    //player.clear();
 }
 
 Order::Order(const Order& o)
 {
     this->player = o.player;
+    this->if_executed = o.if_executed;
 }
 
 string Order::getPlayer()
@@ -41,7 +42,9 @@ bool Order::validate()
 }
 
 void Order::execute()
-{}
+{
+    if_executed = true;
+}
 
 //Stream insertion operator
 ostream& operator<<(std::ostream& out, const Order& o)
@@ -56,11 +59,11 @@ OrdersList::OrdersList()
 
 OrdersList::~OrdersList()
 {
-    for (Order* ord : list)
+    /*for (auto ord : list)
     {
         delete ord;
     }
-    list.clear();
+    list.clear();*/
 }
 
 OrdersList::OrdersList(const OrdersList& theOrdersList)
@@ -89,7 +92,14 @@ void OrdersList::move(int oldPos, int newPos)
 
 void OrdersList::remove(int pos)
 {
-    list.erase(list.begin() + pos);
+    if(pos < list.size())
+    {
+        list.erase(list.begin() + pos);
+    }
+    else
+    {
+        cout << "Out of Range error" << endl;
+    }    
 }
 
 void OrdersList::display()
@@ -101,11 +111,13 @@ void OrdersList::display()
 Deploy::Deploy() : Order(), territory("DefaultTerritory")
 {}
 
-Deploy::Deploy(string thePlayer, string theTerritory) : Order(thePlayer), territory(theTerritory)
+Deploy::Deploy(string thePlayer, bool executed, string theTerritory) : Order(thePlayer, executed), territory(theTerritory)
 {}
 
 Deploy::~Deploy()
-{}
+{   
+    //territory.clear();
+}
 
 Deploy::Deploy(const Deploy& deployObj) : Order(deployObj)
 {
@@ -143,7 +155,10 @@ Advance::Advance() : Order(), source_territory("Source Territory"), adjacent_ter
 {}
 
 Advance::~Advance()
-{}
+{
+    /*source_territory.clear();
+    adjacent_territory.clear();*/
+}
 
 Advance::Advance(const Advance& advanceObj) : Order(advanceObj)
 {
@@ -151,7 +166,7 @@ Advance::Advance(const Advance& advanceObj) : Order(advanceObj)
     this->adjacent_territory = advanceObj.adjacent_territory;
 }
 
-Advance::Advance(string thePlayer, string sourceTerritory, string adjacentTerritory) : Order(thePlayer), source_territory(sourceTerritory), adjacent_territory(adjacentTerritory)
+Advance::Advance(string thePlayer, bool if_executed, string sourceTerritory, string adjacentTerritory) : Order(thePlayer, false), source_territory(sourceTerritory), adjacent_territory(adjacentTerritory)
 {}
 
 bool Advance::validate()
@@ -181,9 +196,11 @@ Bomb::Bomb() : Order(), target("Target Territory")
 {}
 
 Bomb::~Bomb()
-{}
+{
+    //target.clear();
+}
 
-Bomb::Bomb(string player, string theTarget) : Order(player), target(theTarget)
+Bomb::Bomb(string player, bool if_executed, string theTarget) : Order(player, false), target(theTarget)
 {}
 
 Bomb::Bomb(const Bomb& bombObj) : Order(bombObj)
@@ -219,9 +236,11 @@ Blockade::Blockade() : Order(), target("Target Territory")
 {}
 
 Blockade::~Blockade()
-{}
+{
+    //target.clear();
+}
 
-Blockade::Blockade(string player, string theTarget) : Order(), target(theTarget)
+Blockade::Blockade(string player, bool if_executed, string theTarget) : Order(), target(theTarget)
 {}
 
 Blockade::Blockade(const Blockade& blockadeObj) : Order(blockadeObj)
@@ -256,9 +275,12 @@ Airlift::Airlift() : Order(), source("Source Territory"), target("Target Territo
 {}
 
 Airlift::~Airlift()
-{}
+{
+    /*source.clear();
+    target.clear();*/
+}
 
-Airlift::Airlift(string player, string theSource, string theTarget) : Order(), source(theSource), target(theTarget)
+Airlift::Airlift(string player, bool if_executed, string theSource, string theTarget) : Order(), source(theSource), target(theTarget)
 {}
 
 Airlift::Airlift(const Airlift& airliftObj) : Order(airliftObj)
@@ -292,9 +314,11 @@ Negotiate::Negotiate() : Order(), enemy("Enemy Player")
 {}
 
 Negotiate::~Negotiate()
-{}
+{
+    //enemy.clear();
+}
 
-Negotiate::Negotiate(string player, string theEnemy) : Order(), enemy(theEnemy)
+Negotiate::Negotiate(string player, bool if_executed, string theEnemy) : Order(), enemy(theEnemy)
 {}
 
 Negotiate::Negotiate(const Negotiate& negotiateObj) : Order(negotiateObj)
