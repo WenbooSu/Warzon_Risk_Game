@@ -12,7 +12,7 @@ class Order
 public:
     //Constructors
     Order();
-    Order(string player);
+    Order(string player, bool if_executed);
     ~Order();
     Order(const Order& theOrder);
 
@@ -26,6 +26,7 @@ public:
 
 private:
     string player;//Player* player;
+    bool if_executed;
 };
 
 class OrdersList //A list object that holds Order objects
@@ -53,7 +54,7 @@ class Deploy : public Order
 public:
     //Constructors
     Deploy();
-    Deploy(string player, string territory);
+    Deploy(string player, bool if_executed, string territory);
     ~Deploy();
     Deploy(const Deploy& deployObj);
 
@@ -72,7 +73,7 @@ public:
     //Constructors
     Advance();
     ~Advance();
-    Advance(string player, string source_territory, string adjacent_territory);
+    Advance(string player, bool if_executed, string source_territory, string adjacent_territory);
     Advance(const Advance& advanceObj);
 
     bool validate();
@@ -89,7 +90,7 @@ public:
     //Constructors
     Bomb();
     ~Bomb();
-    Bomb(string player, string target);
+    Bomb(string player, bool if_executed, string target);
     Bomb(const Bomb& bombObj);
 
     bool validate();
@@ -105,7 +106,7 @@ public:
     //Constructors
     Blockade();
     ~Blockade();
-    Blockade(string player, string target);
+    Blockade(string player, bool if_executed, string target);
     Blockade(const Blockade& blockadeObj);
 
     bool validate();
@@ -121,7 +122,7 @@ public:
     //Constructors
     Airlift();
     ~Airlift();
-    Airlift(string player, string source, string target);
+    Airlift(string player, bool if_executed, string source, string target);
     Airlift(const Airlift& airliftObj);
 
     bool validate();
@@ -138,7 +139,7 @@ public:
     //Constructors
     Negotiate();
     ~Negotiate();
-    Negotiate(string player, string enemy);
+    Negotiate(string player, bool if_executed, string enemy);
     Negotiate(const Negotiate& negotiateObj);
 
     bool validate();
