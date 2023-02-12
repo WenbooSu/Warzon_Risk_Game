@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Player.h"
+
 #include <string>
 #include <queue>
 
@@ -23,7 +25,7 @@ public:
     friend ostream& operator << (ostream& out, const Order& o);
 
 private:
-    string player;
+    string player;//Player* player;
 };
 
 class OrdersList //A list object that holds Order objects
@@ -43,7 +45,7 @@ public:
     void display();//Might have to take out
 
 private:
-    vector<Order*>* list{};
+    vector<Order*> list{};
 };
 
 class Deploy : public Order
@@ -61,7 +63,7 @@ public:
     friend ostream& operator << (ostream& out, const Deploy& d);
 
 private:
-    string territory;
+    string territory; //Territory territory;
 };
 
 class Advance : public Order
@@ -77,8 +79,8 @@ public:
     void execute();
 
 private:
-    string source_territory;
-    string adjacent_territory;
+    string source_territory; //Territory source_territory;
+    string adjacent_territory; //Territory adjacent_territory;
 };
 
 class Bomb : public Order
@@ -94,7 +96,7 @@ public:
     void execute();
 
 private:
-    string target;
+    string target; //Territory target;
 };
 
 class Blockade : public Order
@@ -110,7 +112,7 @@ public:
     void execute();
 
 private:
-    string target;
+    string target; //Territory target;
 };
 
 class Airlift : public Order
@@ -126,8 +128,8 @@ public:
     void execute();
 
 private:
-    string source;
-    string target;
+    string source; //Territory source_territory;
+    string target; //Territory adjacent_territory;
 };
 
 class Negotiate : public Order
@@ -143,5 +145,5 @@ public:
     void execute();
 
 private:
-    string enemy;
+    string enemy; //Player enemy;
 };
