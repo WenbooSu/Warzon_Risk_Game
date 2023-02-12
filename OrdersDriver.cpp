@@ -10,28 +10,33 @@ string testOrders()
 {
     OrdersList ol;
 
-    Order def_ord;
-    Order ord("player1");
-    Order ord_copy(ord);
-    Deploy dep("player1", "Map1");
-    Advance adv("player1", "Map1", "Map2");
-    Bomb bob("player1", "Map2");
-    Blockade block("player1", "Map1");
-    Airlift air("player1", "Map1", "Map3");
-    Negotiate negot("player1", "player2");
+    Deploy dep("player1", false, "Map1");
+    Advance adv("player1", false, "Map1", "Map2");
+    Bomb bob("player1", false, "Map2");
+    Blockade block("player1", false, "Map1");
+    Airlift air("player1", false, "Map1", "Map3");
+    Negotiate negot("player1", false, "player2");
 
-    //Order* ord_ptr = &def_ord;
-    //ol.display();
-    ol.add(&def_ord);
+    ol.display();
+
+    ol.add(&dep);
+    ol.add(&adv);
+    ol.add(&bob);
+    ol.add(&block);
+    ol.add(&air);
+    ol.add(&negot);
     //vector<Order*> new_ol = ol.getList();
 
-    //cout << dep << endl;
+    ol.remove(7);
+    ol.remove(4);
 
+    ol.move(0, 2);
+
+    ol.display();
+
+    negot.validate();
     negot.execute();
-   
-
-    //Deploy dep;
-    return "OrdersDriver.cpp runs well, I guess?";
+    return "OrdersDriver.cpp runs well, I guess?\n";
 }
 
 int main()
