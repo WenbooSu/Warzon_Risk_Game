@@ -10,6 +10,8 @@ string testOrders()
 {
     OrdersList ol;
 
+    //Order def_ord;
+    //Order ord("player1");
     Deploy dep("player1", false, "Map1");
     Advance adv("player1", false, "Map1", "Map2");
     Bomb bob("player1", false, "Map2");
@@ -25,18 +27,21 @@ string testOrders()
     ol.add(&block);
     ol.add(&air);
     ol.add(&negot);
-    //vector<Order*> new_ol = ol.getList();
 
-    ol.remove(7);
+    /*ol.remove(7);
     ol.remove(4);
 
     ol.move(0, 2);
 
-    ol.display();
+    ol.display();*/
+
+    adv.validate();
+    adv.execute();
 
     negot.validate();
     negot.execute();
-    return "OrdersDriver.cpp runs well, I guess?\n";
+
+    return "OrdersDriver.cpp runs well\n";
 }
 
 int main()
