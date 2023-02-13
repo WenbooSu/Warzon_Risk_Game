@@ -22,7 +22,6 @@ Order::Order(string thePlayer, bool if_executed) : player(thePlayer), if_execute
 
 Order::~Order()
 {
-    //player.clear();
 }
 
 Order::Order(const Order& o)
@@ -59,11 +58,6 @@ OrdersList::OrdersList()
 
 OrdersList::~OrdersList()
 {
-    /*for (auto ord : list)
-    {
-        delete ord;
-    }
-    list.clear();*/
 }
 
 OrdersList::OrdersList(const OrdersList& theOrdersList)
@@ -116,7 +110,6 @@ Deploy::Deploy(string thePlayer, bool executed, string theTerritory) : Order(the
 
 Deploy::~Deploy()
 {   
-    //territory.clear();
 }
 
 Deploy::Deploy(const Deploy& deployObj) : Order(deployObj)
@@ -126,10 +119,7 @@ Deploy::Deploy(const Deploy& deployObj) : Order(deployObj)
 
 bool Deploy::validate()
 {
-    //return Player object's territory list then check if intended territory is in there
-    //vector<string*>  terrList = player.getTerritoryList(); 
-    //return (std::find(terrList.begin(), terrList.end(), territory) != terrList.end())
-    return true; //change
+    return (territory != "DefaultTerritory");
 }
 
 void Deploy::execute()
@@ -156,8 +146,6 @@ Advance::Advance() : Order(), source_territory("Source Territory"), adjacent_ter
 
 Advance::~Advance()
 {
-    /*source_territory.clear();
-    adjacent_territory.clear();*/
 }
 
 Advance::Advance(const Advance& advanceObj) : Order(advanceObj)
@@ -171,19 +159,14 @@ Advance::Advance(string thePlayer, bool if_executed, string sourceTerritory, str
 
 bool Advance::validate()
 {
-
-    return true; //change
+    return (source_territory != adjacent_territory);
 }
 
 void Advance::execute()
 {
     if (validate())
     {
-        cout << "Advancing army" << endl;
-        //return Player object's territory list then check if intended territory is in there
-        //vector<string*>  terrList = player.getTerritoryList(); 
-        //if (std::find(terrList.begin(), terrList.end(), territory) != terrList.end()) {cout << "Army has arrived << endl;}
-        //else {cout << "Attack underway" << endl; std::this_thread::sleep_for(std::chrono::seconds(2)); cout << "Attack complete" << endl;}
+        cout << "Advancing army..." << endl;
     }
     else
     {
@@ -197,7 +180,6 @@ Bomb::Bomb() : Order(), target("Target Territory")
 
 Bomb::~Bomb()
 {
-    //target.clear();
 }
 
 Bomb::Bomb(string player, bool if_executed, string theTarget) : Order(player, false), target(theTarget)
@@ -210,10 +192,7 @@ Bomb::Bomb(const Bomb& bombObj) : Order(bombObj)
 
 bool Bomb::validate()
 {
-    //return Player object's territory list then check if intended territory is in there
-    //vector<string*>  terrList = player.getTerritoryList(); 
-    //return (std::find(terrList.begin(), terrList.end(), territory) != terrList.end())
-    return true; //change
+    return (territory != "DefaultTerritory");
 }
 
 void Bomb::execute()
@@ -221,7 +200,6 @@ void Bomb::execute()
     if (validate())
     {
         cout << "Bombing in progress" << endl;
-        //player.army = player.army/2;
         std::this_thread::sleep_for(std::chrono::seconds(2)); //sleep for 2s
         cout << "Your opponent has lost half their army!" << endl;
     }
@@ -237,10 +215,9 @@ Blockade::Blockade() : Order(), target("Target Territory")
 
 Blockade::~Blockade()
 {
-    //target.clear();
 }
 
-Blockade::Blockade(string player, bool if_executed, string theTarget) : Order(), target(theTarget)
+Blockade::Blockade(string player, bool if_executed, string theTarget) : Order(player, false), target(theTarget)
 {}
 
 Blockade::Blockade(const Blockade& blockadeObj) : Order(blockadeObj)
@@ -250,10 +227,7 @@ Blockade::Blockade(const Blockade& blockadeObj) : Order(blockadeObj)
 
 bool Blockade::validate()
 {
-    //return Player object's territory list then check if intended territory is in there
-    //vector<string*>  terrList = player.getTerritoryList(); 
-    //return (std::find(terrList.begin(), terrList.end(), territory) != terrList.end())
-    return true; //change
+    return (territory != "DefaultTerritory");
 }
 
 void Blockade::execute()
@@ -261,12 +235,10 @@ void Blockade::execute()
     if (validate())
     {
         cout << "Blockade in progress" << endl;
-        //player.army = player.army * 3;
-        //territory.status = 'N'
     }
     else
     {
-        cout << "Invalid order" << endl;
+        cout << "Invalid order: you cannot perform a blockade on this territory" << endl;
     }
 }
 
@@ -276,11 +248,9 @@ Airlift::Airlift() : Order(), source("Source Territory"), target("Target Territo
 
 Airlift::~Airlift()
 {
-    /*source.clear();
-    target.clear();*/
 }
 
-Airlift::Airlift(string player, bool if_executed, string theSource, string theTarget) : Order(), source(theSource), target(theTarget)
+Airlift::Airlift(string player, bool if_executed, string theSource, string theTarget) : Order(player, false), source(theSource), target(theTarget)
 {}
 
 Airlift::Airlift(const Airlift& airliftObj) : Order(airliftObj)
@@ -291,10 +261,7 @@ Airlift::Airlift(const Airlift& airliftObj) : Order(airliftObj)
 
 bool Airlift::validate()
 {
-    //return Player object's territory list then check if intended territory is in there
-    //vector<string*>  terrList = player.getTerritoryList(); 
-    //return (std::find(terrList.begin(), terrList.end(), territory) != terrList.end())
-    return true; //change
+    return (source != target);
 }
 
 void Airlift::execute()
@@ -305,7 +272,7 @@ void Airlift::execute()
     }
     else
     {
-        cout << "Invalid order" << endl;
+        cout << "Invalid order, you cannot airlift into the territry you are own" << endl;
     }
 }
 
@@ -314,11 +281,9 @@ Negotiate::Negotiate() : Order(), enemy("Enemy Player")
 {}
 
 Negotiate::~Negotiate()
-{
-    //enemy.clear();
-}
+{}
 
-Negotiate::Negotiate(string player, bool if_executed, string theEnemy) : Order(), enemy(theEnemy)
+Negotiate::Negotiate(string player, bool if_executed, string theEnemy) : Order(player, false), enemy(theEnemy)
 {}
 
 Negotiate::Negotiate(const Negotiate& negotiateObj) : Order(negotiateObj)
@@ -328,20 +293,19 @@ Negotiate::Negotiate(const Negotiate& negotiateObj) : Order(negotiateObj)
 
 bool Negotiate::validate()
 {
-    //return player == enemy;
-    return true; //change
+   return (getPlayer() != enemy);
 }
 
 void Negotiate::execute()
 {
     if (validate())
     {
-        cout << "Negotiations in progress" << endl;
-        //Territory/string* enemyTerrList = enemy.getTerritoryList(); 
-        //for (auto territory : enemyTerrList) {territory.status = 'N';}
+        cout << "Negotiations in progress..." << endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1)); //sleep for a second
+        cout << "Negotiations complete!" << endl;
     }
     else
     {
-        cout << "Invalid order" << endl;
+        cout << "Invalid order, a player cannot negotiate with themselves" << endl;
     }
 }
