@@ -1,4 +1,5 @@
 #include <iostream>
+#include <conio.h>
 #include "GameEngine.h"
 using namespace std;
 
@@ -10,7 +11,7 @@ string State::getName() {
 }
 
 State* State::invalidCommmand() {
-	cerr << "Error: invalid command entered for " << *this->name << " state\n" << endl;
+	cerr << "Error: invalid command entered for " << *this->name << " state.\n\n" << endl;
 	return nullptr;
 }
 
@@ -239,7 +240,7 @@ State* StateWin::Transition(string command) {
 		Engine Class
 *******************************/
 GameEngine::GameEngine() {
-	currentState = new StateWin();
+	currentState = new StateStart();
 }
 
 GameEngine::GameEngine(GameEngine& engine) {
@@ -261,6 +262,8 @@ string GameEngine::getStateName() {
 }
 
 void GameEngine::ChangeState(string command) {
+	//Store the user's input.
+	this->userCommand = command;
 	//Get the next state from the current state based on user input.
 	State * s = this->currentState->Transition(command);
 	//If a valid State object was returned, delete the curent and replace it with new one.
@@ -280,8 +283,8 @@ ostream& operator<<(ostream& output, const GameEngine& engine) {
 }
 
 istream& operator>>(istream& input, GameEngine& engine) {
-	cout << "\nPlease enter your command:" << endl;
-	input >> engine.userCommand;
-	engine.ChangeState(engine.userCommand);
+	string command;
+	input >> command;
+	engine.ChangeState(command);
 	return input;
 }

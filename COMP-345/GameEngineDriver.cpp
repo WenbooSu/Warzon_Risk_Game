@@ -16,8 +16,10 @@ void play() {
 		cout << "Game Engine Driver.\n\n"
 			<< engine;
 		//Get input to change states.
-		cin >> engine;
+		cout << "\nPlease enter your command:" << endl;
+		cin >> command;
 		//Before changing state, clear the screen.
 		system("cls");
+		engine.ChangeState(command);
 	}
 }

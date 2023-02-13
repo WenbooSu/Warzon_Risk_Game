@@ -21,18 +21,12 @@
     <ClInclude Include="GamEngineDriver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="State.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameEngine.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="GameEngineDriver.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="State.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>
