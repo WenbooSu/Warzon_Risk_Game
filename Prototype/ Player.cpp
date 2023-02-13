@@ -1,20 +1,24 @@
-#include "Player.h"
+#include <vector>
+#include <string>
+#include "OrderTemp.h"
+#include "MapLoader.h"
 #include<iostream>
+#include <algorithm>
 using namespace std;
 
 Player::Player() 
 {
 	string name;
-    vector<string*> territoryList;
+    vector<Territory*> territoryList;
     vector<Hand*> hand;
     vector<Order*> orderList;
 }
 
 
-Player::Player(string name, vector<string*> territoryList, vector<Card*> hand, vector<Order*> orderList) 
+Player::Player(string name, vector<Territory*> territoryList, vector<string*> hand, vector<string*> orderList) 
 {
 	this->name = name;
-	this->territory = territoryList;
+	this->territoryList = territoryList;
 	this->handCard = hand;
 	this->orderList = orderList;
 }
@@ -45,27 +49,29 @@ Player::~Player()
 	
 }
 
-toDefend(vector<string*> territoryA){
+toDefend(vector<Territory*> territoryA){
 	
-	for (auto i = 0; i < terriortyA.size(); i++){
+	cout<<"List of territory to defend";
+	for (int i = 0; i < terriortyA.size(); i++){
 		 cout << terriortyA[i] << '/';
 	}
 
 }
 
-toAttack(vector<string*> territoryD){
+toAttack(vector<Territory*> territoryD){
 	
-	for (auto i = 0; i < terriortyD.size(); i++){
+	cout<<"List of territory to attack";
+	for (int i = 0; i < terriortyD.size(); i++){
 		 cout << terriortyD[i] << '/';
 	}
        
 
 }
 
-issueOrder(string orderParameter){
-    Order *order = new Order(orderParameter);
+issueOrder(string orderParameter){//placeholder for now it is just the name of the order
+    OrderTemp *order = new OrderTemp(orderParameter);//using placeholder class to avoid complication
 	orderList.push_back(order);
-	for (auto i = 0; i < orderList.size(); i++){
+	for (int i = 0; i < orderList.size(); i++){//show the list of order
 		 cout << orderList[i] << '/';
 	}
 
@@ -97,3 +103,42 @@ ostream& operator<<(ostream& os, Player player)
     os << player.getName << '/' << player.getTerritoryList << '/' << player.getOrderList;
     return os;
 }
+
+vector<Territory*> compareTerritoryList(vector<Territory*> fullT1,vector<Territory*> t2) {
+
+	vector<Territory*> terriortyD;
+
+    
+ for (int i = 0; i < t2.size(); i++){
+	
+    if (find(v.begin(), v.end(), t2[i]) != v.end()) {
+        cout << "Element found";
+    }
+    else {
+        cout << "Element not found";
+		terriortyD.push_back(t2[i]);
+    }
+ }
+    return terriortyD;
+}
+
+OrderTemp::OrderTemp() 
+{
+	string title = "No order";
+}
+
+
+OrderTemp::OrderTemp(string titlle) 
+{
+	this->title = title;
+}
+
+
+
+//not deep copy
+OrderTemp::OrderTemp(const OrderTemp& ot) 
+{
+	this->title = ot.title;
+
+}
+
