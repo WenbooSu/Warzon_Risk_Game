@@ -6,7 +6,7 @@
 #include Orders.h
 #include MapLoader.h
 using namespace std;
-ostream& operator<<(ostream& os, Player player);
+
 
 class Player
 {
@@ -29,8 +29,9 @@ public:
     vector<Territory*> setTerritoryList();
     vector<Hand*> setHand();
     vector<Order*> setOrderList();
+};
 
-
+ostream& operator<<(ostream& os, Player player);
 
 private:
     string name;
@@ -46,4 +47,4 @@ class OrderTemp
     OrderTemp(String title);
     OrderTemp(const OrderTemp&); //copy constructor
     String title;
-}
+};
