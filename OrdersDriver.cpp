@@ -16,7 +16,7 @@ string testOrders()
     Advance adv("player1", false, "Map1", "Map2");
     Bomb bob("player1", false, "Map2");
     Blockade block("player1", false, "Map1");
-    Airlift air("player1", false, "Map1", "Map3");
+    Airlift air("player1", false, "Map1", "Map1");
     Negotiate negot("player1", false, "player2");
 
     ol.display();
@@ -28,16 +28,28 @@ string testOrders()
     ol.add(&air);
     ol.add(&negot);
 
-    /*ol.remove(7);
+    ol.remove(7);
     ol.remove(4);
 
     ol.move(0, 2);
 
-    ol.display();*/
+    ol.display();
+    
+    dep.validate();
+    dep.execute();
 
     adv.validate();
     adv.execute();
+    
+    bob.validate();
+    bob.execute();
 
+    block.validate();
+    block.execute();
+    
+    air.validate();
+    air.execute();
+    
     negot.validate();
     negot.execute();
 
