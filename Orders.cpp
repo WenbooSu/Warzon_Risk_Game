@@ -119,10 +119,7 @@ Deploy::Deploy(const Deploy& deployObj) : Order(deployObj)
 
 bool Deploy::validate()
 {
-    //return Player object's territory list then check if intended territory is in there
-    //vector<string*>  terrList = player.getTerritoryList(); 
-    //return (std::find(terrList.begin(), terrList.end(), territory) != terrList.end())
-    return true; //change
+    return (territory != "DefaultTerritory");
 }
 
 void Deploy::execute()
@@ -170,10 +167,6 @@ void Advance::execute()
     if (validate())
     {
         cout << "Advancing army..." << endl;
-        //return Player object's territory list then check if intended territory is in there
-        //vector<string*>  terrList = player.getTerritoryList(); 
-        //if (std::find(terrList.begin(), terrList.end(), territory) != terrList.end()) {cout << "Army has arrived << endl;}
-        //else {cout << "Attack underway" << endl; std::this_thread::sleep_for(std::chrono::seconds(2)); cout << "Attack complete" << endl;}
     }
     else
     {
@@ -199,10 +192,7 @@ Bomb::Bomb(const Bomb& bombObj) : Order(bombObj)
 
 bool Bomb::validate()
 {
-    //return Player object's territory list then check if intended territory is in there
-    //vector<string*>  terrList = player.getTerritoryList(); 
-    //return (std::find(terrList.begin(), terrList.end(), territory) != terrList.end())
-    return true; //change
+    return (territory != "DefaultTerritory");
 }
 
 void Bomb::execute()
@@ -237,10 +227,7 @@ Blockade::Blockade(const Blockade& blockadeObj) : Order(blockadeObj)
 
 bool Blockade::validate()
 {
-    //return Player object's territory list then check if intended territory is in there
-    //vector<string*>  terrList = player.getTerritoryList(); 
-    //return (std::find(terrList.begin(), terrList.end(), territory) != terrList.end())
-    return true; //change
+    return (territory != "DefaultTerritory");
 }
 
 void Blockade::execute()
@@ -251,7 +238,7 @@ void Blockade::execute()
     }
     else
     {
-        cout << "Invalid order" << endl;
+        cout << "Invalid order: you cannot perform a blockade on this territory" << endl;
     }
 }
 
@@ -274,10 +261,7 @@ Airlift::Airlift(const Airlift& airliftObj) : Order(airliftObj)
 
 bool Airlift::validate()
 {
-    //return Player object's territory list then check if intended territory is in there
-    //vector<string*>  terrList = player.getTerritoryList(); 
-    //return (std::find(terrList.begin(), terrList.end(), territory) != terrList.end())
-    return true; //change
+    return (source != target);
 }
 
 void Airlift::execute()
@@ -288,7 +272,7 @@ void Airlift::execute()
     }
     else
     {
-        cout << "Invalid order" << endl;
+        cout << "Invalid order, you cannot airlift into the territry you are own" << endl;
     }
 }
 
