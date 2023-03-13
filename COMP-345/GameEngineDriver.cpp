@@ -2,11 +2,6 @@
 #include "GamEngineDriver.h"
 #include "GameEngine.h"
 
-int main() {
-	play();
-	return 0;
-}
-
 void play() {
 	GameEngine engine;
 	string command;
