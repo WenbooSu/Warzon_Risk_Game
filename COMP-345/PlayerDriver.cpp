@@ -1,7 +1,7 @@
 #include <string>
 #include "Player.h"
 
-int main()
+int PlayerDriver()
 {
     vector<string*> territoryAll;
     vector<string*> territoryP1;

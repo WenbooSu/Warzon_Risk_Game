@@ -1,5 +1,7 @@
 #include <iostream>
 #include <conio.h>
+#include <filesystem>
+#include <sstream>
 #include "GameEngine.h"
 using namespace std;
 
@@ -39,6 +41,11 @@ State* StateStart::Transition(string command){
 	}
 }
 
+void StateStart::Startup() {
+	//Display a list of maps for the user.
+
+}
+
 /*******************************
 	Map Load State Class
 *******************************/
@@ -55,6 +62,7 @@ StateMapLoad::~StateMapLoad() {
 	delete this->transitionValidate;
 }
 
+
 State* StateMapLoad::Transition(string command){
 	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionLoad) == 0) {
@@ -68,6 +76,27 @@ State* StateMapLoad::Transition(string command){
 	}
 }
 
+Map* StateMapLoad::LoadMap(string name) {
+	//Get the map files from the current directory.
+	string path = "../";
+	cout << path + name  << endl;
+	for (filesystem::directory_entry file : filesystem::directory_iterator(path)) {
+		cout << file << endl;
+	}
+	return nullptr;
+}
+
+/*Use the loadmap <filename> command to select a map from a list of maps.*/
+void StateMapLoad::Startup() {
+	//Display a list of maps for the user.
+
+	//Get the map files from the current directory.
+	string path = "./";
+	/*for(filesystem::directory_entry file : filesystem::directory_iterator(path)) {
+		cout << file.path();
+	}*/
+}
+
 /*******************************
 	Map Validate State Class
 *******************************/
@@ -75,11 +104,13 @@ StateMapValidate::StateMapValidate() {
 	//Upon instantiation, set name and command to transition state.
 	this->name = new string("Map Validated");
 	this->transition = new string("addplayer");
+	this->map = nullptr;
 }
 
 StateMapValidate::~StateMapValidate() {
 	delete this->name;
 	delete this->transition;
+	delete this->map;
 }
 
 State* StateMapValidate::Transition(string command){
@@ -92,6 +123,10 @@ State* StateMapValidate::Transition(string command){
 	}
 }
 
+void StateMapValidate::Startup() {
+
+}
+
 /*******************************
 	Add Players State Class
 *******************************/
@@ -99,7 +134,7 @@ StateAddPlayers::StateAddPlayers() {
 	//Upon instantiation, set name and command to both transition states.
 	this->name = new string("Players Added");
 	this->transitionAdd = new string("addplayer");
-	this->transitionPlay = new string("assigncountries");
+	this->transitionPlay = new string("gamestart");
 }
 
 StateAddPlayers::~StateAddPlayers() {
@@ -119,6 +154,10 @@ State* StateAddPlayers::Transition(string command){
 	else {
 		return this->invalidCommmand();
 	}
+}
+
+void StateAddPlayers::Startup() {
+
 }
 
 /************************************
@@ -240,15 +279,18 @@ State* StateWin::Transition(string command) {
 		Engine Class
 *******************************/
 GameEngine::GameEngine() {
-	currentState = new StateStart();
+	this->currentState = new StateStart();
+	this->map = nullptr;
 }
 
 GameEngine::GameEngine(GameEngine& engine) {
 	this->currentState = engine.currentState;
+	this->map = nullptr;
 }
 
 GameEngine::~GameEngine() {
-	delete currentState;
+	delete this->currentState;
+	delete this->map;
 }
 
 bool GameEngine::isPlaying() {
@@ -261,15 +303,45 @@ string GameEngine::getStateName() {
 	return this->currentState->getName();
 }
 
-void GameEngine::ChangeState(string command) {
+bool GameEngine::ChangeState(string command) {
 	//Store the user's input.
 	this->userCommand = command;
 	//Get the next state from the current state based on user input.
 	State * s = this->currentState->Transition(command);
 	//If a valid State object was returned, delete the curent and replace it with new one.
 	if (s != NULL) {
-		delete currentState;
-		currentState = s;
+		delete this->currentState;
+		this->currentState = s;
+		return true;
+	}
+	return false;
+}
+
+void GameEngine::StartupPhase() {
+	string input = "";
+	//Loop until the startup phase has been completed.
+	while (dynamic_cast<StateAssign*>(this->currentState) == nullptr) {
+		cout << "State: " << this->currentState->getName() << endl;
+		cout << "Please enter a command" << endl;
+		//Get the user's command.
+		getline(cin, input);
+		//Split the string: first is the command, second is any input such as map name or player name.
+		const int numCommands = 2;
+		string commands[numCommands];
+		CommandSplit(input, commands, numCommands);
+		//If possible, change state, and captrue the result.
+		bool validaCommand = this->ChangeState(commands[0]);
+		//Based on changed state changed to, do correspoinding part of the startup phase.
+		if (StateMapLoad* s = dynamic_cast<StateMapLoad*>(this->currentState); s != nullptr && validaCommand) {
+			//Given the name of teh map from the command, load it and store it in the game engine.
+			this->map = s->LoadMap(commands[1]);
+		}
+		if (StateMapValidate* s = dynamic_cast<StateMapValidate*>(this->currentState); s != nullptr && validaCommand) {
+			this->map->validate();
+		}
+		if (dynamic_cast<StateAddPlayers*>(this->currentState) != nullptr && validaCommand) {
+		
+		}
 	}
 }
 
@@ -287,4 +359,13 @@ istream& operator>>(istream& input, GameEngine& engine) {
 	input >> command;
 	engine.ChangeState(command);
 	return input;
+}
+
+void GameEngine::CommandSplit(string command, string values[], const int num) {
+	stringstream stream(command);
+	string s;
+	for (int i = 0; i < num; i++) {
+		getline(stream, s, ' ');
+		values[i] = s;
+	}
 }
