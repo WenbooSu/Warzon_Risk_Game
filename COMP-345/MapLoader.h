@@ -8,11 +8,6 @@
 #define A1_MAPLOADER_H
 using namespace std;
 
-/*class Player
-{
-    Player();
-};*/
-
 class Territory
 {
 private:
@@ -97,7 +92,7 @@ public:
     vector<Territory> getCountriesFromMapFile();
     void assignArmies(vector<Continents> cv, vector<Territory> tv);
     void showMap();
-    void verifyMapFile();
+    bool verifyMapFile();
 };
 
 

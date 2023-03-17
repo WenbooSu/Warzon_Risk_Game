@@ -1,4 +1,25 @@
-﻿  GameEngine.cpp
+﻿  Card.cpp
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\Card.cpp(48,18): warning C4018: '<': signed/unsigned mismatch
+  CardDriver.cpp
+  GameEngine.cpp
+  GameEngineDriver.cpp
+  MapDriver.cpp
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\MapDriver.cpp(27,19): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\MapDriver.cpp(33,19): warning C4018: '<': signed/unsigned mismatch
+  MapLoader.cpp
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\MapLoader.cpp(198,19): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\MapLoader.cpp(238,23): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\MapLoader.cpp(240,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\MapLoader.cpp(260,23): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\MapLoader.cpp(273,19): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\MapLoader.cpp(283,19): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\MapLoader.cpp(285,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\MapLoader.cpp(392,19): warning C4018: '<': signed/unsigned mismatch
+  Player.cpp
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\Player.cpp(59,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\Player.cpp(69,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\Player.cpp(119,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\Player.cpp(129,20): warning C4018: '<': signed/unsigned mismatch
   PlayerDriver.cpp
   Generating Code...
   COMP-345.vcxproj -> C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\Debug\COMP-345.exe

@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
+#include <vector>
 #include "MapLoader.h"
+#include "Card.h"
+
 using namespace std;
 
 /*
@@ -58,7 +61,7 @@ public:
 	StateMapLoad();
 	State* Transition(string command);
 	void Startup();
-	Map* LoadMap(string map);
+	MapLoader* LoadMap(string map);
 };
 
 /*
@@ -160,11 +163,13 @@ public:
 */
 class GameEngine {
 private:
-	void CommandSplit(string, string values[], int);
-	State* currentState;
 	const string* const commandEnd = new string("end");
+	State* currentState;
 	string userCommand;
-	Map* map;
+	MapLoader* map;
+	vector<Player*> players;
+	Deck* deck;
+	void CommandSplit(string, string values[], int);
 
 public:
 	GameEngine();
@@ -182,7 +187,7 @@ public:
 	/*Compare name of this current state and parameter's.*/
 	bool operator == (GameEngine* engine);
 	/*Print the engine's current state.*/
-	friend ostream& operator<<(ostream&, const GameEngine&);
+	friend ostream& operator << (ostream&, const GameEngine&);
 	/*Take input as a command.*/
-	friend istream& operator>>(istream&, GameEngine&);
+	friend istream& operator >> (istream&, GameEngine&);
 };

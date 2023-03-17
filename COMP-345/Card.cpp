@@ -58,3 +58,7 @@ Order playerHand::play(int handPos,Deck &d1){
     Order o1;
     return o1;
 }
+
+std::vector<Card> Deck::getDeck() {
+    return this->baseDeck;
+}

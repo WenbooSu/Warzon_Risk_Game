@@ -2,6 +2,8 @@
 #include <conio.h>
 #include <filesystem>
 #include <sstream>
+#include <algorithm>
+#include <random>
 #include "GameEngine.h"
 using namespace std;
 
@@ -76,13 +78,21 @@ State* StateMapLoad::Transition(string command){
 	}
 }
 
-Map* StateMapLoad::LoadMap(string name) {
-	//Get the map files from the current directory.
+MapLoader* StateMapLoad::LoadMap(string mapName) {
+	MapLoader* mapLoader = new MapLoader();
+	//Path to directory with map files.
 	string path = "../";
-	cout << path + name  << endl;
+	//Look through each file in the directory for a matching name.
 	for (filesystem::directory_entry file : filesystem::directory_iterator(path)) {
-		cout << file << endl;
+		string fileName = file.path().string();
+		fileName = fileName.substr(1,fileName.size() - 1);
+		//If mach found, return the map loader, with the file name.
+		if (fileName.compare("./" + mapName) == 0) {
+			mapLoader = new MapLoader(path + fileName);
+			return mapLoader;
+		}
 	}
+	//Otherwise, return null pointer to indicate nothing found.
 	return nullptr;
 }
 
@@ -281,16 +291,24 @@ State* StateWin::Transition(string command) {
 GameEngine::GameEngine() {
 	this->currentState = new StateStart();
 	this->map = nullptr;
+	this->deck = new Deck();
 }
 
 GameEngine::GameEngine(GameEngine& engine) {
 	this->currentState = engine.currentState;
 	this->map = nullptr;
+	this->deck = new Deck();
 }
 
 GameEngine::~GameEngine() {
+	delete this->commandEnd;
 	delete this->currentState;
 	delete this->map;
+	//Go through each play in the instance's player vector and delete them.
+	for (Player* p : this->players) {
+		delete p;
+	}
+	delete this->deck;
 }
 
 bool GameEngine::isPlaying() {
@@ -319,30 +337,91 @@ bool GameEngine::ChangeState(string command) {
 
 void GameEngine::StartupPhase() {
 	string input = "";
+	bool validMap = false;
+	const int numCommands = 2;
+	const int minPlayers = 2;
+	const int maxPlayers = 6;
+	int numPlayers = 0;
 	//Loop until the startup phase has been completed.
 	while (dynamic_cast<StateAssign*>(this->currentState) == nullptr) {
-		cout << "State: " << this->currentState->getName() << endl;
+		cout << "\n\nState: " << this->currentState->getName() << endl;
 		cout << "Please enter a command" << endl;
-		//Get the user's command.
+		//Get the user's command and input.
 		getline(cin, input);
 		//Split the string: first is the command, second is any input such as map name or player name.
-		const int numCommands = 2;
 		string commands[numCommands];
 		CommandSplit(input, commands, numCommands);
-		//If possible, change state, and captrue the result.
-		bool validaCommand = this->ChangeState(commands[0]);
+		//If possible, change state, and capture the result.
+		bool validCommand = this->ChangeState(commands[0]);
 		//Based on changed state changed to, do correspoinding part of the startup phase.
-		if (StateMapLoad* s = dynamic_cast<StateMapLoad*>(this->currentState); s != nullptr && validaCommand) {
-			//Given the name of teh map from the command, load it and store it in the game engine.
+		if (StateMapLoad* s = dynamic_cast<StateMapLoad*>(this->currentState); s != nullptr && validCommand) {
 			this->map = s->LoadMap(commands[1]);
+			//If the map does not exist in the directory, do not allow user to proceed to validate map state.
+			validMap = this->map == nullptr ? false : true;
+			if (validMap) {
+				this->map->showMap();
+			}
 		}
-		if (StateMapValidate* s = dynamic_cast<StateMapValidate*>(this->currentState); s != nullptr && validaCommand) {
-			this->map->validate();
+		if (StateMapValidate* s = dynamic_cast<StateMapValidate*>(this->currentState); s != nullptr && validCommand && validMap) {
+			//If the map is invalid, stay in the map load state.
+			if (!this->map->verifyMapFile()) {
+				this->currentState = new StateMapLoad();
+			}
 		}
-		if (dynamic_cast<StateAddPlayers*>(this->currentState) != nullptr && validaCommand) {
-		
+		//If the map in load state is invalid, inform the user and stay in load map state.
+		else if (!validMap) {
+			cout << "Please enter a valid map." << endl;
+			this->currentState = new StateMapLoad();
+		}
+		if (dynamic_cast<StateAddPlayers*>(this->currentState) != nullptr && validCommand) {
+			//Given a name, create a new player, and add them to the vector of players. Minimum 2, max of 6.
+			if (numPlayers < maxPlayers) {
+				numPlayers++;
+				Player* player = new Player();
+				player->setName(commands[1]);
+				cout << player->getName() << endl;
+				this->players.push_back(player);
+			}
+			else {
+				cout << "Maximum of 6 players, no more can be added." << endl;
+			}
+		}
+		//When attempting to end startup phase, check that there are ewnough players, if not, stay in add players state.
+		if (dynamic_cast<StateAssign*>(this->currentState) != nullptr && numPlayers < minPlayers) {
+			cout << "Minimum of 2 players needed. There're currently: " + numPlayers << endl;
+			this->currentState = new StateAddPlayers();
 		}
 	}
+	//At the end of the startup phase, after adding players, start by setting up the deck of cards.
+	const int numCards = 2 * numPlayers;
+	this->deck->createDeck(numCards);
+	//Begin by distributing the territories to players.
+	vector<Territory> territories = this->map->getCountriesFromMapFile();
+	int numTerritoriesPerPlayer = territories.size() / numPlayers;
+	vector<Territory*> territoryList = vector<Territory*>();
+	Player* player = this->players[0];
+	int j = 0;
+	for (int i = 0; i < (numTerritoriesPerPlayer * numPlayers); i++) {
+		if (i % numTerritoriesPerPlayer == 0 && i != 0) {
+			player = this->players[++j];
+		}
+		territoryList.push_back(&territories[i]);
+		cout << "Player: " + player->getName() << "\tAdded: " + territories[i].getTerritoryName() << endl;
+	}
+	player = nullptr;
+	//Determine random play order.
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::shuffle(this->players.begin(), this->players.end(), mt);
+	const int startingArmies = 50;
+	for (Player* player : this->players) {
+		cout << player->getName() << endl;
+		//Give each player 50 armies initially to their reinforcement pool.
+		player->addArmies(startingArmies);
+		//Let each playe draw 2 cards from the deck.
+		player->addToHand(this->deck->draw());
+	}
+	cout << "Tails, you made it! Hey hey hey!" << endl;
 }
 
 bool GameEngine::operator==(GameEngine* engine) {
