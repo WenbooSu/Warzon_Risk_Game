@@ -8,26 +8,25 @@
 using namespace std;
 
 
-Player::Player()
-{
+Player::Player(){
 	string name;
 	vector<string*> territoryList;
 	vector<string*> hand;
 	OrdersList orderList;
+	this->armies = new int(0);
 }
 
 
-Player::Player(string name, vector<Territory*> territoryList, playerHand hand, OrdersList ordersList)
-{
+Player::Player(string name, vector<Territory*> territoryList, playerHand hand, OrdersList ordersList){
 	this->name = name;
 	this->territoryList = territoryList;
 	this->hand = hand;
 	this->orderList = orderList;
+	this->armies = new int(0);
 }
 
 //not deep copy
-Player::Player(const Player& p)
-{
+Player::Player(const Player& p){
 	this->name = p.name;
 	this->territoryList = p.territoryList;
 	this->hand = p.hand;
@@ -110,7 +109,7 @@ int* Player::getArmies() {
 }
 
 void Player::addArmies(int added) {
-	this->armies += added;
+	*this->armies += added;
 }
 
 ostream& operator<<(ostream& os, Player player){

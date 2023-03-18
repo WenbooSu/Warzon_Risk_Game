@@ -413,15 +413,19 @@ void GameEngine::StartupPhase() {
 	std::random_device rd;
 	std::mt19937 mt(rd());
 	std::shuffle(this->players.begin(), this->players.end(), mt);
-	const int startingArmies = 50;
+	const int armiesStart = 50;
 	for (Player* player : this->players) {
-		cout << player->getName() << endl;
+		cout << "Player: " + player->getName() << endl;
 		//Give each player 50 armies initially to their reinforcement pool.
-		player->addArmies(startingArmies);
+		player->addArmies(armiesStart);
+		cout << "Added initial " << *player->getArmies() << " armies to player" << endl;
 		//Let each playe draw 2 cards from the deck.
 		player->addToHand(this->deck->draw());
+		player->addToHand(this->deck->draw());
+		cout << "The following cards have been added to their hand: " << endl;
+		player->getHand().showHand();
+		cout << endl;
 	}
-	cout << "Tails, you made it! Hey hey hey!" << endl;
 }
 
 bool GameEngine::operator==(GameEngine* engine) {

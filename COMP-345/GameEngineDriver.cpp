@@ -18,12 +18,3 @@ void GameEngineDriver() {
 		engine.ChangeState(command);
 	}
 }
-
-int main() {
-	GameEngine engine;
-	engine.StartupPhase();
-	string s;
-	getline(cin, s);
-	cout << s;
-	return 0;
-}
