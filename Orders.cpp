@@ -31,10 +31,6 @@ Order::Order(const Order& o)
     this->if_executed = o.if_executed;
 }
 
-string Order::getPlayer()
-{
-    return player;
-}
 
 Player* Order::getOwner()
 {
@@ -44,7 +40,7 @@ Player* Order::getOwner()
 //Stream insertion operator
 ostream& operator<<(std::ostream& out, const Order& o)
 {
-    return out << "Performing an operation by " << o.player << endl;
+    return out << "Performing an operation by " << o.owner->getName() << endl;
 }
 
 //--OrdersList--
@@ -98,14 +94,14 @@ void OrdersList::display()
 }
 
 //--Deploy--
-Deploy::Deploy() : Order(), army_deploy(0), territory1(nullptr)
+Deploy::Deploy() : Order(), army_deploy(0), territory(nullptr)
 {}
 
 /*Deploy::Deploy(Player* player, bool if_executed, string territory) : Order(player, if_executed), territory(territory)
 {
 }*/
 
-Deploy::Deploy(Player* player1, bool if_executed, int army_to_deploy, Territory* territory) : Order(player1, if_executed), army_deploy(army_to_deploy), territory1(territory)
+Deploy::Deploy(Player* player1, bool if_executed, int army_to_deploy, Territory* territory) : Order(player1, if_executed), army_deploy(army_to_deploy), territory(territory)
 {
 }
 
@@ -115,14 +111,14 @@ Deploy::~Deploy()
 
 Deploy::Deploy(const Deploy& deployObj) : Order(deployObj)
 {
-    this->territory1 = deployObj.territory1;
+    this->territory = deployObj.territory;
     this->army_deploy = deployObj.army_deploy;
 }
 
 bool Deploy::validate()
 {
     vector<Territory*> checkList = getOwner()->getTerritoryList();
-    return (find(checkList.begin(), checkList.end(), territory1) != checkList.end());
+    return (find(checkList.begin(), checkList.end(), territory) != checkList.end());
 }
 
 void Deploy::execute()
@@ -130,7 +126,7 @@ void Deploy::execute()
     if (validate())
     {
         cout << "Deploying army on player territory.." << endl;
-        territory1->setArmies(army_deploy + territory1->getArmies());
+        territory->setArmies(army_deploy + territory->getArmies());
         getOwner()->addArmies((army_deploy * -1));
         std::this_thread::sleep_for(std::chrono::seconds(1));
         cout << "Army deployed!" << endl;
@@ -144,11 +140,11 @@ void Deploy::execute()
 //Stream insertion operator
 ostream& operator << (std::ostream& out, const Deploy& d)
 {
-    return out << "Deloying army on " << d.territory1->getTerritoryName() << endl;
+    return out << "Deloying army on " << d.territory->getTerritoryName() << endl;
 }
 
 //--Advance--
-Advance::Advance() : Order(), source_territory("Source Territory"), adjacent_territory("Adjacent Territory")
+Advance::Advance() : Order(), source_territory1(nullptr), adjacent_territory1(nullptr), source_territory("Source Territory"), adjacent_territory("Adjacent Territory")
 {}
 
 Advance::~Advance()
@@ -159,13 +155,26 @@ Advance::Advance(const Advance& advanceObj) : Order(advanceObj)
 {
     this->source_territory = advanceObj.source_territory;
     this->adjacent_territory = advanceObj.adjacent_territory;
+
+    this->source_territory1 = advanceObj.source_territory1;
+    this->adjacent_territory1 = advanceObj.adjacent_territory1;
 }
 
 Advance::Advance(Player *theOwner, bool if_executed, string sourceTerritory, string adjacentTerritory) : Order(theOwner, false), source_territory(sourceTerritory), adjacent_territory(adjacentTerritory)
 {}
 
+Advance::Advance(Player *theOwner, bool if_executed, Territory * sourceTerritory1, Territory * adjacentTerritory1) : Order(theOwner, false), source_territory1(sourceTerritory1), adjacent_territory1(adjacentTerritory1)
+{
+}
+
 bool Advance::validate()
 {
+    /*vector<Territory*> checkList = getOwner()->getTerritoryList();
+
+    if (find(checkList.begin(), checkList.end(), source_territory) != checkList.end())
+        return false;
+
+    return true;*/
     return (source_territory != adjacent_territory);
 }
 
