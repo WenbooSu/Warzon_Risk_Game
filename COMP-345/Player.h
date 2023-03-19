@@ -1,14 +1,18 @@
+#pragma once
 #include <vector>
 #include <string>
 #include <iostream>
 #include "Orders.h"
+#include "Card.h"
 
 using namespace std;
+
+class Territory;    //Forward declaration of the class. The include for Mapload.h is in the cpp file for Player.
 
 class Player {
 public:
     Player();
-    Player(string, vector<string*>, vector<string*>, OrdersList);
+    Player(string, vector<Territory*>, playerHand, OrdersList);
 
     Player(const Player&); //copy constructor
 
@@ -17,22 +21,25 @@ public:
     void issueOrder(string);
 
     string getName();
-    vector<string*> getTerritoryList();
-    vector<string*> getHand();//Hand class
+    vector<Territory*> getTerritoryList();
+    playerHand getHand();//Hand class
     OrdersList getOrderList();//Orderlist class
 
     void setName(string);
-    vector<string*> setTerritoryList();
-    vector<string*> setHand();
+    void setTerritoryList(vector<Territory*>);
+    playerHand setHand();
+    void addToHand(Card);
     OrdersList setOrderList();
-    vector<string*> compareTerritoryList(vector<string*>, vector<string*>);
+    vector<Territory*> compareTerritoryList(vector<Territory*>, vector<Territory*>);
+    int* getArmies();
+    void addArmies(int);
 
 private:
     string name;
-    vector<string*> territoryList;
-    vector<string*> hand;
+    vector<Territory*> territoryList;
+    playerHand hand;
     OrdersList orderList;
-
+    int* armies;
 };
 
 ostream& operator<<(ostream& os, Player player);

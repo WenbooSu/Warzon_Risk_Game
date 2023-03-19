@@ -299,7 +299,10 @@ MapLoader::~MapLoader() {
 }
 
 MapLoader::MapLoader(string fileName) {
-    this->fileName=fileName;
+    this->fileName = fileName;
+    vector<Territory> countries = this->getCountriesFromMapFile();
+    this->map = Map(countries, fileName); //map creates here
+    this->map.toString();
 }
 
 vector<Continents> MapLoader::getContinentsFromMapFile() {
@@ -427,7 +430,7 @@ int MapLoader::getLineCount(std::string fileName, std::string a, std::string b) 
     return (count-1);
 }
 
-void MapLoader::verifyMapFile() {
+bool MapLoader::verifyMapFile() {
     int count=0;
     int a=0;
     int b=0;
@@ -471,10 +474,11 @@ void MapLoader::verifyMapFile() {
     if(a==b && a==c && b==c)
     {
         cout<< "The Map File is Valid"<<endl;
+        return true;
     }
     else
     {
         cout<< "The Map File is NOT Valid"<<endl;
-        exit(-1);
+        return false;
     }
 }

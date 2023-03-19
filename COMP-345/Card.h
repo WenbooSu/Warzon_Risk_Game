@@ -23,17 +23,19 @@ public:
 };
 
 class Deck{
-public:
+private:
     //this is the Container of cards used to draw from
     std::vector<Card> baseDeck;
-    //returns a card from the deck and removing it
-    Card draw();
     //randomizes order of draw
     int random();
+public:
+    //returns a card from the deck and removing it
+    Card draw();
     //allows for cards to be returned to the deck
     void returnCard(Card);
     //this is used to populate the base deck with the amount of cards chosen
     void createDeck(int number);
+    std::vector<Card> getDeck();
 };
 
 class playerHand{

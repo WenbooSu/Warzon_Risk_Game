@@ -1,9 +1,9 @@
 #include <iostream>
-#include "GamEngineDriver.h"
 #include "GameEngine.h"
 
-void play() {
+void GameEngineDriver() {
 	GameEngine engine;
+	const string stateNameEnd = "win";
 	string command;
 	//The main game loop. Continues until the user inputs "end" and someone wins.
 	while (engine.isPlaying()) {

@@ -1,9 +1,9 @@
 #include <string>
 #include "Player.h"
 
-int main()
+int PlayerDriver()
 {
-    vector<string*> territoryAll;
+   /* vector<string*> territoryAll;
     vector<string*> territoryP1;
     vector<string*> territoryP2;
     string t1 = "Canada";
@@ -54,5 +54,6 @@ int main()
 
     p1.issueOrder("Deploy");
     p2.issueOrder("Airlift");
+   */
     return 0;
 }

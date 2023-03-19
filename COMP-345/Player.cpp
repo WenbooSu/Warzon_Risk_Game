@@ -3,34 +3,35 @@
 #include<iostream>
 #include <algorithm>
 #include "Player.h"
+#include "MapLoader.h"
 
 using namespace std;
 
 
-Player::Player()
-{
+Player::Player(){
 	string name;
 	vector<string*> territoryList;
 	vector<string*> hand;
 	OrdersList orderList;
+	this->armies = new int(0);
 }
 
 
-Player::Player(string name, vector<string*> territoryList, vector<string*> hand, OrdersList ordersList)
-{
+Player::Player(string name, vector<Territory*> territoryList, playerHand hand, OrdersList ordersList){
 	this->name = name;
 	this->territoryList = territoryList;
 	this->hand = hand;
 	this->orderList = orderList;
+	this->armies = new int(0);
 }
 
 //not deep copy
-Player::Player(const Player& p)
-{
+Player::Player(const Player& p){
 	this->name = p.name;
 	this->territoryList = p.territoryList;
 	this->hand = p.hand;
 	this->orderList = p.orderList;
+	*this->armies = *p.armies;
 }
 
 //PlayerOrder::~PlayerOrder()
@@ -83,23 +84,37 @@ void Player::setName(string name) {
 	this->name = name;
 }
 
-vector<string*> Player::getTerritoryList() {
+vector<Territory*> Player::getTerritoryList() {
 	return this->territoryList;
 }
 
-vector<string*> Player::getHand() {
+void Player::setTerritoryList(vector<Territory*>) {
+
+}
+
+playerHand Player::getHand() {
 	return this->hand;
+}
+
+void Player::addToHand(Card card) {
+	this->hand.add(card);
 }
 
 OrdersList Player::getOrderList() {
 	return orderList;
 }
 
+int* Player::getArmies() {
+	return this->armies;
+}
 
-ostream& operator<<(ostream& os, Player player)
-{
+void Player::addArmies(int added) {
+	*this->armies += added;
+}
+
+ostream& operator<<(ostream& os, Player player){
 	os << player.getName() << '/';
-	vector<string*> t = player.getTerritoryList();
+	vector<Territory*> t = player.getTerritoryList();
 	for (int i = 0; i < t.size(); i++) {
 		os << t[i];
 	}
@@ -108,8 +123,8 @@ ostream& operator<<(ostream& os, Player player)
 	return os;
 }
 
-vector<string*> Player::compareTerritoryList(vector<string*> fullT1, vector<string*> t2) {
-	vector<string*> terriortyD;
+vector<Territory*> Player::compareTerritoryList(vector<Territory*> fullT1, vector<Territory*> t2) {
+	vector<Territory*> terriortyD;
 	for (int i = 0; i < t2.size(); i++) {
 
 		if (find(fullT1.begin(), fullT1.end(), fullT1[i]) != fullT1.end()) {
