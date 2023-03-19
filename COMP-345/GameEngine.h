@@ -176,7 +176,7 @@ public:
 	~GameEngine();
 	/*Copy Constructor*/
 	GameEngine(GameEngine& engine);
-	/*Check if the game should continue based on user inputand state.*/
+	/*Check if the game should continue based on user input and state.*/
 	bool isPlaying();
 	/*Return the name of the current state*/
 	string getStateName();
@@ -184,6 +184,14 @@ public:
 	bool ChangeState(string command);
 	/*Call the startup method of the current state to commence it part of the startup phase.*/
 	void StartupPhase();
+	/*Main game loop of the Warzone game, following the startup phase and turn order decided there.*/
+	void mainGameLoop();
+	//The first phase which we give armies depending on the player controlled territory
+	void reinforcementPhase();
+	//The second phase in which the players issue orders
+	void issueOrdersPhase();
+	//The last phase where the orders are executed and ending the players turn
+	void executeOrdersPhase(Player* player);
 	/*Compare name of this current state and parameter's.*/
 	bool operator == (GameEngine* engine);
 	/*Print the engine's current state.*/

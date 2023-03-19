@@ -16,9 +16,9 @@ public:
 
     Player(const Player&); //copy constructor
 
-    void toDefend(vector<string*>);
-    void toAttack(vector<string*>);
-    void issueOrder(string);
+    vector<Territory*> toDefend();
+    vector<Territory*> toAttack();
+    void issueOrder();
 
     string getName();
     vector<Territory*> getTerritoryList();
@@ -27,6 +27,7 @@ public:
 
     void setName(string);
     void setTerritoryList(vector<Territory*>);
+    void addTerritory(Territory*);
     playerHand setHand();
     void addToHand(Card);
     OrdersList setOrderList();

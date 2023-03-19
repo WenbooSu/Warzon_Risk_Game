@@ -398,14 +398,18 @@ void GameEngine::StartupPhase() {
 	//Begin by distributing the territories to players.
 	vector<Territory> territories = this->map->getCountriesFromMapFile();
 	int numTerritoriesPerPlayer = territories.size() / numPlayers;
-	vector<Territory*> territoryList = vector<Territory*>();
+	//vector<Territory*> territoryList = vector<Territory*>();
 	Player* player = this->players[0];
 	int j = 0;
 	for (int i = 0; i < (numTerritoriesPerPlayer * numPlayers); i++) {
 		if (i % numTerritoriesPerPlayer == 0 && i != 0) {
 			player = this->players[++j];
 		}
-		territoryList.push_back(&territories[i]);
+		//Add the territory to the player's list of territories.
+		Territory* t = new Territory(territories[i]);
+		player->addTerritory(t);
+		//Assign the player pointer to the territory.
+		territories[i].setPlayer(player);
 		cout << "Player: " + player->getName() << "\tAdded: " + territories[i].getTerritoryName() << endl;
 	}
 	player = nullptr;
@@ -427,6 +431,94 @@ void GameEngine::StartupPhase() {
 		cout << endl;
 	}
 }
+
+void GameEngine::mainGameLoop() {
+	//If the no one has won the game, continue the main game loop.
+	while (dynamic_cast<StateWin*>(currentState) == nullptr) {
+		//Begin each cycle of the main game loop with the reinforcement phase.
+		this->reinforcementPhase();
+		this->ChangeState("issueorder");
+		//Now, for each player, in order, allow them them to issue orders.
+		this->issueOrdersPhase();
+		//Once all the orders have been issued, execute them.
+
+		//Verify that each player controls at least one territory, if not, remove them from the game.
+
+	}
+}
+
+void GameEngine::reinforcementPhase() {
+	double basicReinforcement;
+	double controlBonus;
+	double totalArmiesAdded;
+	//For each player, add their respective number of armies based on territories owned.
+	cout << "This is the reinforcement phase and the player will be given a number of armies\n" << endl;
+	for (Player* player : this->players) {
+		basicReinforcement = floor(player->getTerritoryList().size() / 3);
+		controlBonus = 0;
+		//By default, no matter how many territories owned, a player will receive three armies.
+		if (basicReinforcement < 3) {
+			basicReinforcement = 3;
+		}
+		totalArmiesAdded = basicReinforcement + controlBonus;
+		cout << "For player: " + player->getName() << endl;
+		cout << "Player's control bonus = " << controlBonus << endl;
+		cout << "Player's basic reinforcement = " << basicReinforcement << endl;;
+		cout << "The player will now receive " << totalArmiesAdded << " armies" << endl;;
+		player->addArmies(totalArmiesAdded);
+	}
+}
+
+void GameEngine::issueOrdersPhase() {
+	int playersDone = 0;
+	while(playersDone < this->players.size()) {
+		for (Player* player : this->players) {
+			player->issueOrder();
+
+		}
+	}
+}
+
+//void GameEngine::issueOrdersPhase() {
+//	int answer = 0;
+//	bool loop = true;
+//	do {
+//		do {
+//			cout << "This is the phase in which you can issue orders" << '/';
+//
+//			cout << "Please choose any of the option below: " << '/';
+//
+//			cout << "1- Deploy army to an enemy territory" << '/';
+//			cout << "2- Deploy army to an allied territory" << '/';
+//			cout << "3- Play a card from your hand" << '/';
+//			cout << "4- That is all my orders" << '/';
+//
+//			cin >> answer;
+//			if (answer == 1 || answer == 2 || answer == 3 || answer == 4) {
+//
+//				loop = false;
+//			}
+//
+//		} while (loop);
+//		loop = true;
+//		switch (answer) {
+//		case 1:
+//			player->toAttack();
+//			break;
+//		case 2:
+//			player->toDefend();
+//			break;
+//		case 3:
+//			player->issueOrder();
+//			break;
+//		case 4:
+//			break;
+//		default:
+//			cout << "An error has probably occured" << '/';
+//			break;
+//		}
+//	} while (answer != 4);
+//}
 
 bool GameEngine::operator==(GameEngine* engine) {
 	return this->getStateName() == engine->getStateName();
