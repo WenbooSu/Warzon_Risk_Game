@@ -18,7 +18,6 @@ public:
     Order(const Order& theOrder);
 
     //Accessors
-    string getPlayer();
     Player* getOwner();
     
     //Methods
@@ -28,7 +27,6 @@ public:
     friend ostream& operator << (ostream& out, const Order& o);
 
 private:
-    string player;
     Player *owner;
     bool if_executed;
 };
@@ -58,7 +56,7 @@ class Deploy : public Order
 public:
     //Constructors
     Deploy();
-    Deploy(Player* owner, bool if_executed, int army_deploy, Territory* territory1);
+    Deploy(Player* owner, bool if_executed, int army_deploy, Territory* territory);
     ~Deploy();
     Deploy(const Deploy& deployObj);
 
@@ -69,7 +67,7 @@ public:
 
 private:
     int army_deploy;
-    Territory *territory1;
+    Territory *territory;
 };
 
 class Advance : public Order
@@ -78,15 +76,18 @@ public:
     //Constructors
     Advance();
     ~Advance();
-    Advance(Player *owner, bool if_executed, string source_territory, string adjacent_territory);
+    Advance(Player* owner, bool if_executed, string source_territory, string adjacent_territory);
+    Advance(Player *owner, bool if_executed, Territory* source_territory1, Territory* adjacent_territory1);
     Advance(const Advance& advanceObj);
 
     bool validate() override;
     void execute() override;
 
 private:
-    string source_territory; //Territory source_territory;
-    string adjacent_territory; //Territory adjacent_territory;
+    string source_territory; 
+    Territory *source_territory1;
+    string adjacent_territory; 
+    Territory *adjacent_territory1;
 };
 
 class Bomb : public Order
