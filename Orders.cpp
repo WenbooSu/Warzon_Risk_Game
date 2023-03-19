@@ -1,6 +1,7 @@
 #include "Orders.h"
 #include "Player.h"
 #include "Card.h"
+#include "MapLoader.h"
 
 #include <string>
 #include <queue>
@@ -12,11 +13,11 @@
 using namespace std;
 
 //--Orders--
-Order::Order() : player("Default Player"), if_executed(false)
+Order::Order() : owner(nullptr), if_executed(false)
 {
 }
 
-Order::Order(string thePlayer, bool if_executed) : player(thePlayer), if_executed(false)
+Order::Order(Player* theOwner, bool if_executed) : owner(theOwner), if_executed(false)
 {
 }
 
@@ -26,7 +27,7 @@ Order::~Order()
 
 Order::Order(const Order& o)
 {
-    this->player = o.player;
+    this->owner = o.owner;
     this->if_executed = o.if_executed;
 }
 
@@ -35,14 +36,9 @@ string Order::getPlayer()
     return player;
 }
 
-bool Order::validate()
+Player* Order::getOwner()
 {
-    return false;
-}
-
-void Order::execute()
-{
-    if_executed = true;
+    return owner;
 }
 
 //Stream insertion operator
@@ -73,7 +69,7 @@ vector<Order*> OrdersList::getList()
     return list;
 }
 
-void  OrdersList::add(Order *ord)
+void  OrdersList::add(Order* ord)
 {
     list.push_back(ord);
 }
@@ -86,14 +82,14 @@ void OrdersList::move(int oldPos, int newPos)
 
 void OrdersList::remove(int pos)
 {
-    if(pos < list.size())
+    if (pos < list.size())
     {
         list.erase(list.begin() + pos);
     }
     else
     {
         cout << "Out of Range error" << endl;
-    }    
+    }
 }
 
 void OrdersList::display()
@@ -102,31 +98,42 @@ void OrdersList::display()
 }
 
 //--Deploy--
-Deploy::Deploy() : Order(), territory("DefaultTerritory")
+Deploy::Deploy() : Order(), army_deploy(0), territory1(nullptr)
 {}
 
-Deploy::Deploy(string thePlayer, bool executed, string theTerritory) : Order(thePlayer, executed), territory(theTerritory)
-{}
+/*Deploy::Deploy(Player* player, bool if_executed, string territory) : Order(player, if_executed), territory(territory)
+{
+}*/
+
+Deploy::Deploy(Player* player1, bool if_executed, int army_to_deploy, Territory* territory) : Order(player1, if_executed), army_deploy(army_to_deploy), territory1(territory)
+{
+}
 
 Deploy::~Deploy()
-{   
+{
 }
 
 Deploy::Deploy(const Deploy& deployObj) : Order(deployObj)
 {
-    this->territory = deployObj.territory;
+    this->territory1 = deployObj.territory1;
+    this->army_deploy = deployObj.army_deploy;
 }
 
 bool Deploy::validate()
 {
-    return (territory != "DefaultTerritory");
+    vector<Territory*> checkList = getOwner()->getTerritoryList();
+    return (find(checkList.begin(), checkList.end(), territory1) != checkList.end());
 }
 
 void Deploy::execute()
 {
     if (validate())
     {
-        cout << "Deploying army on player territory" << endl;
+        cout << "Deploying army on player territory.." << endl;
+        territory1->setArmies(army_deploy + territory1->getArmies());
+        getOwner()->addArmies((army_deploy * -1));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        cout << "Army deployed!" << endl;
     }
     else
     {
@@ -137,7 +144,7 @@ void Deploy::execute()
 //Stream insertion operator
 ostream& operator << (std::ostream& out, const Deploy& d)
 {
-    return out << "Deloying army on " << d.territory << endl;
+    return out << "Deloying army on " << d.territory1->getTerritoryName() << endl;
 }
 
 //--Advance--
@@ -154,7 +161,7 @@ Advance::Advance(const Advance& advanceObj) : Order(advanceObj)
     this->adjacent_territory = advanceObj.adjacent_territory;
 }
 
-Advance::Advance(string thePlayer, bool if_executed, string sourceTerritory, string adjacentTerritory) : Order(thePlayer, false), source_territory(sourceTerritory), adjacent_territory(adjacentTerritory)
+Advance::Advance(Player *theOwner, bool if_executed, string sourceTerritory, string adjacentTerritory) : Order(theOwner, false), source_territory(sourceTerritory), adjacent_territory(adjacentTerritory)
 {}
 
 bool Advance::validate()
@@ -182,17 +189,20 @@ Bomb::~Bomb()
 {
 }
 
-Bomb::Bomb(string player, bool if_executed, string theTarget) : Order(player, false), target(theTarget)
+Bomb::Bomb(Player *owner, bool if_executed, string theTarget) : Order(owner, false), target(theTarget)
 {}
+
 
 Bomb::Bomb(const Bomb& bombObj) : Order(bombObj)
 {
     this->target = bombObj.target;
 }
 
+//string Bomb::get
+
 bool Bomb::validate()
 {
-    return (territory != "DefaultTerritory");
+    return (target != "Target Territory");
 }
 
 void Bomb::execute()
@@ -217,7 +227,7 @@ Blockade::~Blockade()
 {
 }
 
-Blockade::Blockade(string player, bool if_executed, string theTarget) : Order(player, false), target(theTarget)
+Blockade::Blockade(Player *owner, bool if_executed, string theTarget) : Order(owner, false), target(theTarget)
 {}
 
 Blockade::Blockade(const Blockade& blockadeObj) : Order(blockadeObj)
@@ -227,7 +237,7 @@ Blockade::Blockade(const Blockade& blockadeObj) : Order(blockadeObj)
 
 bool Blockade::validate()
 {
-    return (territory != "DefaultTerritory");
+    return (target != "Target Territory");
 }
 
 void Blockade::execute()
@@ -250,7 +260,7 @@ Airlift::~Airlift()
 {
 }
 
-Airlift::Airlift(string player, bool if_executed, string theSource, string theTarget) : Order(player, false), source(theSource), target(theTarget)
+Airlift::Airlift(Player *owner, bool if_executed, string theSource, string theTarget) : Order(owner, false), source(theSource), target(theTarget)
 {}
 
 Airlift::Airlift(const Airlift& airliftObj) : Order(airliftObj)
@@ -277,14 +287,15 @@ void Airlift::execute()
 }
 
 //--Negotiate--
-Negotiate::Negotiate() : Order(), enemy("Enemy Player")
+Negotiate::Negotiate() : Order(), enemy("Enemy Player"), enemyPlayer(nullptr)
 {}
 
 Negotiate::~Negotiate()
 {}
 
-Negotiate::Negotiate(string player, bool if_executed, string theEnemy) : Order(player, false), enemy(theEnemy)
-{}
+Negotiate::Negotiate(Player *owner, bool if_executed, Player *enemyPlayer) : Order(owner, if_executed), enemyPlayer(enemyPlayer)
+{
+}
 
 Negotiate::Negotiate(const Negotiate& negotiateObj) : Order(negotiateObj)
 {
@@ -293,7 +304,7 @@ Negotiate::Negotiate(const Negotiate& negotiateObj) : Order(negotiateObj)
 
 bool Negotiate::validate()
 {
-   return (getPlayer() != enemy);
+    return (this->getOwner() != enemyPlayer);
 }
 
 void Negotiate::execute()
