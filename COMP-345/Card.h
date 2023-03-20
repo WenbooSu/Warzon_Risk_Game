@@ -47,7 +47,7 @@ public:
     //displays the type of each card the player has
     void showHand();
     //takes a int which is used to pick which card from the hand to remove and add back to deck
-    Order play(int handPos,Deck &d1);
+    Card play(int handPos,Deck &d1);
 };
 
 #endif /* Card_hpp */

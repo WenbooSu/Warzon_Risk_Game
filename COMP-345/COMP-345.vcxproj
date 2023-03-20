@@ -152,6 +152,7 @@
     <ClCompile Include="CardDriver.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameEngineDriver.cpp" />
+    <ClCompile Include="MaineGameLoopDriver.cpp" />
     <ClCompile Include="MapDriver.cpp" />
     <ClCompile Include="MapLoader.cpp" />
     <ClCompile Include="Orders.cpp" />

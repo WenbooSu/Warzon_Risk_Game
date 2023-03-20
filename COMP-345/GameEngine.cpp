@@ -398,14 +398,18 @@ void GameEngine::StartupPhase() {
 	//Begin by distributing the territories to players.
 	vector<Territory> territories = this->map->getCountriesFromMapFile();
 	int numTerritoriesPerPlayer = territories.size() / numPlayers;
-	vector<Territory*> territoryList = vector<Territory*>();
+	//vector<Territory*> territoryList = vector<Territory*>();
 	Player* player = this->players[0];
 	int j = 0;
 	for (int i = 0; i < (numTerritoriesPerPlayer * numPlayers); i++) {
 		if (i % numTerritoriesPerPlayer == 0 && i != 0) {
 			player = this->players[++j];
 		}
-		territoryList.push_back(&territories[i]);
+		//Add the territory to the player's list of territories.
+		Territory* t = new Territory(territories[i]);
+		player->addTerritory(t);
+		//Assign the player pointer to the territory.
+		territories[i].setPlayer(player);
 		cout << "Player: " + player->getName() << "\tAdded: " + territories[i].getTerritoryName() << endl;
 	}
 	player = nullptr;
@@ -425,6 +429,80 @@ void GameEngine::StartupPhase() {
 		cout << "The following cards have been added to their hand: " << endl;
 		player->getHand().showHand();
 		cout << endl;
+	}
+}
+
+void GameEngine::mainGameLoop() {
+	//If the no one has won the game, continue the main game loop.
+	while (dynamic_cast<StateWin*>(currentState) == nullptr) {
+		//Begin each cycle of the main game loop with the reinforcement phase.
+		this->reinforcementPhase();
+		this->ChangeState("issueorder");
+		//Now, for each player, in order, allow them them to issue orders.
+		this->issueOrdersPhase();
+		//Once all the orders have been issued, execute them in round robin fashion.
+		this->executeOrdersPhase();
+		//Verify that each player controls at least one territory, if not, remove them from the game.
+		for (int i = 0; i < this->players.size(); i++) {
+			if (this->players[i]->getTerritoryList().size() < 1) {
+				this->players.erase(this->players.begin() + i);
+			}
+		}
+	}
+}
+
+void GameEngine::reinforcementPhase() {
+	double basicReinforcement;
+	double controlBonus;
+	double totalArmiesAdded;
+	//For each player, add their respective number of armies based on territories owned.
+	cout << "This is the reinforcement phase and the player will be given a number of armies\n" << endl;
+	for (Player* player : this->players) {
+		basicReinforcement = floor(player->getTerritoryList().size() / 3);
+		controlBonus = 0;
+		//Determine bonus armies.
+		
+		//By default, no matter how many territories owned, a player will receive three armies.
+		if (basicReinforcement < 3) {
+			basicReinforcement = 3;
+		}
+		totalArmiesAdded = basicReinforcement + controlBonus;
+		cout << "For player: " + player->getName() << endl;
+		cout << "Player's control bonus = " << controlBonus << endl;
+		cout << "Player's basic reinforcement = " << basicReinforcement << endl;;
+		cout << "The player will now receive " << totalArmiesAdded << " armies" << endl;;
+		player->addArmies(totalArmiesAdded);
+	}
+}
+
+void GameEngine::issueOrdersPhase() {
+	for (Player* player : this->players) {
+		player->issueOrder(this->deck, this->players, this->map->getCountriesFromMapFile());
+	}
+}
+
+
+void GameEngine::executeOrdersPhase() {
+	int playesOrdersDone = 0;
+	//Reset number of players done every iteration, keep iterating until all players are done.
+	while (playesOrdersDone < this->players.size()) {
+		playesOrdersDone = 0;
+		int i = 0;
+		for (Player* player : this->players) {
+			OrdersList playerOrderList = player->getOrderList();
+			if (playerOrderList.getList().size() > 1) {
+				//If it is not empty, get the front element.
+				Order* order = playerOrderList.getList()[0];
+				//Since the order list is like a queue, remove the first element, and then execute it
+				playerOrderList.getList().erase(playerOrderList.getList().begin() + i);
+				order->execute();
+			}
+			else {
+				//If that player no longer has orders to execute, count them as done.
+				playesOrdersDone++;
+			}
+		}
+		i++;
 	}
 }
 

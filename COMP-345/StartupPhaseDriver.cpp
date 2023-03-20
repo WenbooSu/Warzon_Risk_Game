@@ -1,6 +1,6 @@
 #include "GameEngine.h"
 
-int main() {
+int drivers() {
 	GameEngine engine;
 	engine.StartupPhase();
 	return 0;

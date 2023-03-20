@@ -20,18 +20,19 @@ private:
 
 public:
     Territory(); //default constructor
-    Territory( const Territory*); //copy constructor
     Territory(string continentID, string territoryName, int countryID);
     Territory (string continentID, string territoryName, Player* player, int numArmies, int countryID);
     ~Territory(); //destructor
     string getContinentID(); //return the Continent that contains this territory
     string getTerritoryName(); //return the name of the territory
     Player* getPlayer(); //return the owner of the territory
+    void setPlayer(Player*); //Set the owner of the territory
     int getArmies(); //return the number of military units on this territory
     int getTerritoryID();
     int getGraphWeight();
     void setGraphWeight();
     void setArmies(int a);
+    void addArmies(int a);
 };
 
 class Continents
@@ -68,7 +69,6 @@ public:
     Map(vector<Territory> countries, string fileName);
     Map(int numOfNodes);
     ~Map();
-    //void setMatrix(vector<Territory> countries);
     void addEdge(int n, int m);
     void toString();
     bool validate();
@@ -92,6 +92,7 @@ public:
     vector<Territory> getCountriesFromMapFile();
     void assignArmies(vector<Continents> cv, vector<Territory> tv);
     void showMap();
+
     bool verifyMapFile();
 };
 

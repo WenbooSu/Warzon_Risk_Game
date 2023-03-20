@@ -62,9 +62,7 @@ Territory::Territory() {
     weight=0;
 }
 
-Territory::Territory(const Territory *) {
 
-}
 
 Territory::Territory(std::string continentID, std::string territoryName, int countryID) {
     this->continentID=continentID;
@@ -114,8 +112,16 @@ void Territory::setArmies(int a) {
     this->armies=a;
 }
 
+void Territory::addArmies(int a) {
+    this->armies += a;
+}
+
 Player* Territory::getPlayer() {
     return this->player;
+}
+
+void Territory::setPlayer(Player* player) {
+    this->player = player;
 }
 
 Map::Map() {
@@ -401,6 +407,8 @@ void MapLoader::assignArmies(vector<Continents> cv, vector<Territory> tv) {
 void MapLoader::showMap() {
     map.toString();
 }
+
+
 
 int MapLoader::getLineCount(std::string fileName, std::string a, std::string b) {
     int count=0;

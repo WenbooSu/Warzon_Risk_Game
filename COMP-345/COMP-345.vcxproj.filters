@@ -71,5 +71,8 @@
     <ClCompile Include="StartupPhaseDriver.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="MaineGameLoopDriver.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

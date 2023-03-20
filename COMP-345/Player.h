@@ -13,12 +13,12 @@ class Player {
 public:
     Player();
     Player(string, vector<Territory*>, playerHand, OrdersList);
-
     Player(const Player&); //copy constructor
+    ~Player();
 
-    void toDefend(vector<string*>);
-    void toAttack(vector<string*>);
-    void issueOrder(string);
+    vector<Territory*> toDefend();
+    vector<Territory*> toAttack(vector<Territory>);
+    void issueOrder(Deck*, vector<Player*>, vector<Territory>);
 
     string getName();
     vector<Territory*> getTerritoryList();
@@ -28,6 +28,7 @@ public:
 
     void setName(string);
     void setTerritoryList(vector<Territory*>);
+    void addTerritory(Territory*);
     playerHand setHand();
     void addToHand(Card);
     OrdersList setOrderList();
@@ -42,6 +43,7 @@ private:
     playerHand hand;
     OrdersList orderList;
     int* armies;
+    Territory* getTerritoryByName(vector<Territory*>, string);
 };
 
 ostream& operator<<(ostream& os, Player player);
