@@ -97,10 +97,6 @@ void OrdersList::display()
 Deploy::Deploy() : Order(), army_deploy(0), territory(nullptr)
 {}
 
-/*Deploy::Deploy(Player* player, bool if_executed, string territory) : Order(player, if_executed), territory(territory)
-{
-}*/
-
 Deploy::Deploy(Player* player1, bool if_executed, int army_to_deploy, Territory* territory) : Order(player1, if_executed), army_deploy(army_to_deploy), territory(territory)
 {
 }
@@ -191,27 +187,33 @@ void Advance::execute()
 }
 
 //--Bomb--
-Bomb::Bomb() : Order(), target("Target Territory")
+Bomb::Bomb() : Order(), target_territory(nullptr)
 {}
 
 Bomb::~Bomb()
 {
 }
 
-Bomb::Bomb(Player *owner, bool if_executed, string theTarget) : Order(owner, false), target(theTarget)
-{}
+Bomb::Bomb(Player * owner, bool if_executed, Territory *target_territory) : Order(owner, false), target_territory(target_territory)
+{
+}
 
 
 Bomb::Bomb(const Bomb& bombObj) : Order(bombObj)
 {
-    this->target = bombObj.target;
+    this->target_territory = bombObj.target_territory;
 }
-
-//string Bomb::get
 
 bool Bomb::validate()
 {
-    return (target != "Target Territory");
+    vector<Territory*> checkList = getOwner()->getTerritoryList();
+
+    if (find(checkList.begin(), checkList.end(), target_territory) != checkList.end())
+        return false;
+
+    //Adjacency thing
+
+    return true;
 }
 
 void Bomb::execute()
@@ -219,6 +221,7 @@ void Bomb::execute()
     if (validate())
     {
         cout << "Bombing in progress" << endl;
+        target_territory->setArmies(target_territory->getArmies() / 2);
         std::this_thread::sleep_for(std::chrono::seconds(2)); //sleep for 2s
         cout << "Your opponent has lost half their army!" << endl;
     }
@@ -229,31 +232,36 @@ void Bomb::execute()
 }
 
 //--Blockade--
-Blockade::Blockade() : Order(), target("Target Territory")
+Blockade::Blockade() : Order(), target_territory(nullptr)
 {}
 
 Blockade::~Blockade()
 {
 }
 
-Blockade::Blockade(Player *owner, bool if_executed, string theTarget) : Order(owner, false), target(theTarget)
-{}
+Blockade::Blockade(Player * owner, bool if_executed, Territory *target_territory) : Order(owner, false), target_territory(target_territory)
+{
+}
 
 Blockade::Blockade(const Blockade& blockadeObj) : Order(blockadeObj)
 {
-    this->target = blockadeObj.target;
+    this->target_territory = blockadeObj.target_territory;
 }
 
 bool Blockade::validate()
 {
-    return (target != "Target Territory");
+    vector<Territory*> checkList = getOwner()->getTerritoryList();
+    return (find(checkList.begin(), checkList.end(), target_territory) != checkList.end());
 }
 
 void Blockade::execute()
 {
     if (validate())
     {
-        cout << "Blockade in progress" << endl;
+        cout << "Blockade in progress..." << endl;
+        target_territory->setArmies(target_territory->getArmies() * 2);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        cout << "Blockade Complete!" << endl;
     }
     else
     {
@@ -262,25 +270,35 @@ void Blockade::execute()
 }
 
 //--Airlift--
-Airlift::Airlift() : Order(), source("Source Territory"), target("Target Territory")
+Airlift::Airlift() : Order(), army_deploy(0), source_territory(nullptr), target_territory(nullptr)
 {}
 
 Airlift::~Airlift()
 {
 }
 
-Airlift::Airlift(Player *owner, bool if_executed, string theSource, string theTarget) : Order(owner, false), source(theSource), target(theTarget)
-{}
+Airlift::Airlift(Player * owner, bool if_executed, int army_to_deploy, Territory * source_territory, Territory * target_territory) : Order(owner, false), army_deploy(army_to_deploy), source_territory(source_territory), target_territory(target_territory)
+{
+}
 
 Airlift::Airlift(const Airlift& airliftObj) : Order(airliftObj)
 {
-    this->source = airliftObj.source;
-    this->target = airliftObj.target;
+    this->army_deploy = airliftObj.army_deploy;
+    this->source_territory = airliftObj.source_territory;
+    this->target_territory = airliftObj.target_territory;
 }
 
 bool Airlift::validate()
 {
-    return (source != target);
+    vector<Territory*> checkList = getOwner()->getTerritoryList();
+
+    if (!(find(checkList.begin(), checkList.end(), source_territory) != checkList.end()))
+        return false;
+
+    if (!(find(checkList.begin(), checkList.end(), target_territory) != checkList.end()))
+        return false;
+
+    return true;
 }
 
 void Airlift::execute()
@@ -288,6 +306,10 @@ void Airlift::execute()
     if (validate())
     {
         cout << "Airlifting armies into target territory" << endl;
+        target_territory->setArmies(army_deploy + target_territory->getArmies());
+        source_territory->setArmies(source_territory->getArmies() - army_deploy);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        cout << "Army airlifted onto the territory!" << endl;
     }
     else
     {
@@ -296,7 +318,7 @@ void Airlift::execute()
 }
 
 //--Negotiate--
-Negotiate::Negotiate() : Order(), enemy("Enemy Player"), enemyPlayer(nullptr)
+Negotiate::Negotiate() : Order(), enemyPlayer(nullptr)
 {}
 
 Negotiate::~Negotiate()
@@ -308,7 +330,7 @@ Negotiate::Negotiate(Player *owner, bool if_executed, Player *enemyPlayer) : Ord
 
 Negotiate::Negotiate(const Negotiate& negotiateObj) : Order(negotiateObj)
 {
-    this->enemy = negotiateObj.enemy;
+    this->enemyPlayer = negotiateObj.enemyPlayer;
 }
 
 bool Negotiate::validate()
