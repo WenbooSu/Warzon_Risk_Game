@@ -69,7 +69,6 @@ public:
     Map(vector<Territory> countries, string fileName);
     Map(int numOfNodes);
     ~Map();
-    //void setMatrix(vector<Territory> countries);
     void addEdge(int n, int m);
     void toString();
     bool validate();
@@ -93,6 +92,7 @@ public:
     vector<Territory> getCountriesFromMapFile();
     void assignArmies(vector<Continents> cv, vector<Territory> tv);
     void showMap();
+
     bool verifyMapFile();
 };
 

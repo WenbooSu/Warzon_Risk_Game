@@ -191,7 +191,7 @@ public:
 	//The second phase in which the players issue orders
 	void issueOrdersPhase();
 	//The last phase where the orders are executed and ending the players turn
-	void executeOrdersPhase(Player* player);
+	void executeOrdersPhase();
 	/*Compare name of this current state and parameter's.*/
 	bool operator == (GameEngine* engine);
 	/*Print the engine's current state.*/

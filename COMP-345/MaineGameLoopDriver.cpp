@@ -1,7 +1,8 @@
 #include "GameEngine.h"
 
-int drivers() {
+int main() {
 	GameEngine engine;
 	engine.StartupPhase();
+	engine.mainGameLoop();
 	return 0;
 }

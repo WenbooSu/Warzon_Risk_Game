@@ -35,8 +35,8 @@ void Deck::createDeck(int number){
     for(int i =0;i<number;i++){
         baseDeck.push_back(Card("bomb"));
         baseDeck.push_back(Card("airlift"));
-        baseDeck.push_back(Card("diplomacy"));
-        baseDeck.push_back(Card("reinforcement"));
+        baseDeck.push_back(Card("negotiate"));
+        baseDeck.push_back(Card("blockade"));
     }
 }
 //Takes a card to be added to the players hand
@@ -45,18 +45,18 @@ void playerHand::add(Card c1){
 }
 //this for loops over players hand to display what types of cards he has
 void playerHand::showHand(){
-    for(int i=0;i< hand.size();i++)
-    {
-        std::cout<<hand[i].CardType <<"\n";
+    for(int i=0;i< hand.size();i++){
+        std::cout << i + 1;
+        std::cout<< "\t" + hand[i].CardType << "\n";
     }
 }
 //displays the card being played returning the card before erasing it from players hand
-Order playerHand::play(int handPos,Deck &d1){
+Card playerHand::play(int handPos,Deck &d1){
     std::cout<< "playing the card " << hand[handPos].CardType <<"\n";
+    Card card = hand[handPos];
     d1.returnCard(hand[handPos]);
     hand.erase(hand.begin()+handPos);
-    Order o1;
-    return o1;
+    return card;
 }
 
 std::vector<Card> Deck::getDeck() {

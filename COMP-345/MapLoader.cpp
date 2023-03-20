@@ -408,6 +408,8 @@ void MapLoader::showMap() {
     map.toString();
 }
 
+
+
 int MapLoader::getLineCount(std::string fileName, std::string a, std::string b) {
     int count=0;
     ifstream inStream;

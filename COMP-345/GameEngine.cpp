@@ -440,10 +440,14 @@ void GameEngine::mainGameLoop() {
 		this->ChangeState("issueorder");
 		//Now, for each player, in order, allow them them to issue orders.
 		this->issueOrdersPhase();
-		//Once all the orders have been issued, execute them.
-
+		//Once all the orders have been issued, execute them in round robin fashion.
+		this->executeOrdersPhase();
 		//Verify that each player controls at least one territory, if not, remove them from the game.
-
+		for (int i = 0; i < this->players.size(); i++) {
+			if (this->players[i]->getTerritoryList().size() < 1) {
+				this->players.erase(this->players.begin() + i);
+			}
+		}
 	}
 }
 
@@ -456,6 +460,8 @@ void GameEngine::reinforcementPhase() {
 	for (Player* player : this->players) {
 		basicReinforcement = floor(player->getTerritoryList().size() / 3);
 		controlBonus = 0;
+		//Determine bonus armies.
+		
 		//By default, no matter how many territories owned, a player will receive three armies.
 		if (basicReinforcement < 3) {
 			basicReinforcement = 3;
@@ -470,55 +476,35 @@ void GameEngine::reinforcementPhase() {
 }
 
 void GameEngine::issueOrdersPhase() {
-	int playersDone = 0;
-	while(playersDone < this->players.size()) {
-		for (Player* player : this->players) {
-			player->issueOrder();
-
-		}
+	for (Player* player : this->players) {
+		player->issueOrder(this->deck, this->players, this->map->getCountriesFromMapFile());
 	}
 }
 
-//void GameEngine::issueOrdersPhase() {
-//	int answer = 0;
-//	bool loop = true;
-//	do {
-//		do {
-//			cout << "This is the phase in which you can issue orders" << '/';
-//
-//			cout << "Please choose any of the option below: " << '/';
-//
-//			cout << "1- Deploy army to an enemy territory" << '/';
-//			cout << "2- Deploy army to an allied territory" << '/';
-//			cout << "3- Play a card from your hand" << '/';
-//			cout << "4- That is all my orders" << '/';
-//
-//			cin >> answer;
-//			if (answer == 1 || answer == 2 || answer == 3 || answer == 4) {
-//
-//				loop = false;
-//			}
-//
-//		} while (loop);
-//		loop = true;
-//		switch (answer) {
-//		case 1:
-//			player->toAttack();
-//			break;
-//		case 2:
-//			player->toDefend();
-//			break;
-//		case 3:
-//			player->issueOrder();
-//			break;
-//		case 4:
-//			break;
-//		default:
-//			cout << "An error has probably occured" << '/';
-//			break;
-//		}
-//	} while (answer != 4);
-//}
+
+void GameEngine::executeOrdersPhase() {
+	int playesOrdersDone = 0;
+	//Reset number of players done every iteration, keep iterating until all players are done.
+	while (playesOrdersDone < this->players.size()) {
+		playesOrdersDone = 0;
+		int i = 0;
+		for (Player* player : this->players) {
+			OrdersList playerOrderList = player->getOrderList();
+			if (playerOrderList.getList().size() > 1) {
+				//If it is not empty, get the front element.
+				Order* order = playerOrderList.getList()[0];
+				//Since the order list is like a queue, remove the first element, and then execute it
+				playerOrderList.getList().erase(playerOrderList.getList().begin() + i);
+				order->execute();
+			}
+			else {
+				//If that player no longer has orders to execute, count them as done.
+				playesOrdersDone++;
+			}
+		}
+		i++;
+	}
+}
 
 bool GameEngine::operator==(GameEngine* engine) {
 	return this->getStateName() == engine->getStateName();
