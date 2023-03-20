@@ -96,14 +96,14 @@ public:
     //Constructors
     Bomb();
     ~Bomb();
-    Bomb(Player *owner, bool if_executed, string target);
+    Bomb(Player *owner, bool if_executed, Territory* target_territory);
     Bomb(const Bomb& bombObj);
 
     bool validate() override;
     void execute() override;
 
 private:
-    string target; //Territory target;
+    Territory *target_territory;
 };
 
 class Blockade : public Order
@@ -112,14 +112,14 @@ public:
     //Constructors
     Blockade();
     ~Blockade();
-    Blockade(Player *owner, bool if_executed, string target);
+    Blockade(Player *owner, bool if_executed, Territory* target_territory);
     Blockade(const Blockade& blockadeObj);
 
     bool validate() override;
     void execute() override;
 
 private:
-    string target; //Territory target;
+    Territory *target_territory;
 };
 
 class Airlift : public Order
@@ -128,15 +128,16 @@ public:
     //Constructors
     Airlift();
     ~Airlift();
-    Airlift(Player *owner, bool if_executed, string source, string target);
+    Airlift(Player *owner, bool if_executed, int army_to_deploy, Territory* source_territory, Territory* target_territory);
     Airlift(const Airlift& airliftObj);
 
     bool validate() override;
     void execute() override;
 
 private:
-    string source; //Territory source_territory;
-    string target; //Territory adjacent_territory;
+    int army_deploy;
+    Territory *source_territory;
+    Territory * target_territory;
 };
 
 class Negotiate : public Order
@@ -152,6 +153,5 @@ public:
     void execute() override;
 
 private:
-    string enemy; 
     Player *enemyPlayer;
 };
