@@ -104,6 +104,11 @@ OrdersList Player::getOrderList() {
 	return orderList;
 }
 
+void Player::noAttack(Player* ally)
+{
+	this->noAttackList.push_back(ally);
+}
+
 int* Player::getArmies() {
 	return this->armies;
 }
