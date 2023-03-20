@@ -24,6 +24,7 @@ public:
     vector<Territory*> getTerritoryList();
     playerHand getHand();//Hand class
     OrdersList getOrderList();//Orderlist class
+    void noAttack(Player *ally);
 
     void setName(string);
     void setTerritoryList(vector<Territory*>);
@@ -37,6 +38,7 @@ public:
 private:
     string name;
     vector<Territory*> territoryList;
+    vector<Player*> noAttackList;
     playerHand hand;
     OrdersList orderList;
     int* armies;
