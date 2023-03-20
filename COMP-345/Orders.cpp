@@ -140,7 +140,7 @@ ostream& operator << (std::ostream& out, const Deploy& d)
 }
 
 //--Advance--
-Advance::Advance() : Order(), source_territory1(nullptr), adjacent_territory1(nullptr), source_territory("Source Territory"), adjacent_territory("Adjacent Territory")
+Advance::Advance() : Order(), army_deploy(0), source_territory(nullptr), adjacent_territory(nullptr)
 {}
 
 Advance::~Advance()
@@ -149,36 +149,64 @@ Advance::~Advance()
 
 Advance::Advance(const Advance& advanceObj) : Order(advanceObj)
 {
+    this->army_deploy = advanceObj.army_deploy;
     this->source_territory = advanceObj.source_territory;
     this->adjacent_territory = advanceObj.adjacent_territory;
-
-    this->source_territory1 = advanceObj.source_territory1;
-    this->adjacent_territory1 = advanceObj.adjacent_territory1;
 }
 
-Advance::Advance(Player *theOwner, bool if_executed, string sourceTerritory, string adjacentTerritory) : Order(theOwner, false), source_territory(sourceTerritory), adjacent_territory(adjacentTerritory)
-{}
-
-Advance::Advance(Player *theOwner, bool if_executed, Territory * sourceTerritory1, Territory * adjacentTerritory1) : Order(theOwner, false), source_territory1(sourceTerritory1), adjacent_territory1(adjacentTerritory1)
+Advance::Advance(Player *theOwner, bool if_executed, int army_to_deploy, Territory * sourceTerritory, Territory * adjacentTerritory) : Order(theOwner, false), army_deploy(army_to_deploy), source_territory(sourceTerritory), adjacent_territory(adjacentTerritory)
 {
 }
 
 bool Advance::validate()
 {
-    /*vector<Territory*> checkList = getOwner()->getTerritoryList();
+    vector<Territory*> checkList = getOwner()->getTerritoryList();
+    //vector<Territory*> checkList = getOwner()->getTerritoryList();
 
     if (find(checkList.begin(), checkList.end(), source_territory) != checkList.end())
         return false;
+    //Adjacency
 
-    return true;*/
-    return (source_territory != adjacent_territory);
+    return true;
 }
 
 void Advance::execute()
 {
+    vector<Territory*> checkList = getOwner()->getTerritoryList();
+
     if (validate())
     {
         cout << "Advancing army..." << endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        if (find(checkList.begin(), checkList.end(), adjacent_territory) != checkList.end())
+        {            
+            adjacent_territory->setArmies(adjacent_territory->getArmies() + army_deploy);
+            source_territory->setArmies(source_territory->getArmies() - army_deploy);
+            cout << "Your army has advanced to friendly territory!" << endl;
+        }
+        else
+        {
+            source_territory->setArmies(source_territory->getArmies() - army_deploy);
+
+            while (army_deploy > 0 && source_territory->getArmies() > 0)
+            {
+                if ((rand() % 10) < 6)
+                {
+                    source_territory->setArmies(source_territory->getArmies() - 1);
+                }
+                if ((rand() % 10) < 7)
+                {
+                    army_deploy -= 1;
+                }
+            }
+
+            if (source_territory->getArmies() == 0)
+            {
+                source_territory->setArmies(army_deploy);
+                cout << "Congratulations, this territory now belongs to you!" << endl;
+            }
+        }
     }
     else
     {
@@ -343,6 +371,8 @@ void Negotiate::execute()
     if (validate())
     {
         cout << "Negotiations in progress..." << endl;
+        this->getOwner()->noAttack(enemyPlayer);
+        enemyPlayer->noAttack(this->getOwner());
         std::this_thread::sleep_for(std::chrono::seconds(1)); //sleep for a second
         cout << "Negotiations complete!" << endl;
     }
