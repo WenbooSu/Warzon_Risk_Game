@@ -67,6 +67,14 @@ vector<Territory*> Player::toAttack(vector<Territory> allTerritories) {
 	cout << "List of territories to attack: " << endl;
 	bool found = false;
 	Territory* enemy;
+	/*
+	
+	
+	ERROR WHEN TRYING TO FIND ALL TERRITORIES THAT DON'T BELONG TO YOU, 
+	IT ONLYS HOWS ONE YOU DON'T OWN.
+	
+	
+	*/
 	for (Territory t : allTerritories) {
 		for (Territory* territory : this->getTerritoryList()) {
 			enemy = territory;
