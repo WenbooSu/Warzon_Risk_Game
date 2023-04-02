@@ -494,6 +494,11 @@ void GameEngine::executeOrdersPhase() {
 				//If it is not empty, get the front element.
 				Order* order = playerOrderList.getList()[0];
 				//Since the order list is like a queue, remove the first element, and then execute it
+				/*
+				
+				ERROR WHEN TRYING TO REMOVE ORDER FROM LIST.
+				
+				*/
 				playerOrderList.getList().erase(playerOrderList.getList().begin() + i);
 				order->execute();
 			}
