@@ -90,6 +90,7 @@ public:
     //int getLineCount(string fileName, string a, string b);
     vector<Continents> getContinentsFromMapFile();
     vector<Territory> getCountriesFromMapFile();
+    vector<Territory*> countries;
     void assignArmies(vector<Continents> cv, vector<Territory> tv);
     void showMap();
 

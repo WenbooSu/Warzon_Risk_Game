@@ -11,18 +11,19 @@ using namespace std;
 Player::Player(){
 	string name;
 	vector<string*> territoryList;
-	vector<string*> hand;
-	OrdersList orderList;
-	this->armies = new int(0);
+	OrdersList o;
+	this->orderList = new OrdersList();
+	this->hand = new playerHand();
+	this->armies = 0;
 }
 
 
-Player::Player(string name, vector<Territory*> territoryList, playerHand hand, OrdersList ordersList){
+Player::Player(string name, vector<Territory*> territoryList, playerHand* hand, OrdersList* ordersList){
 	this->name = name;
 	this->territoryList = territoryList;
 	this->hand = hand;
 	this->orderList = orderList;
-	this->armies = new int(0);
+	this->armies = 0;
 }
 
 //not deep copy
@@ -31,11 +32,10 @@ Player::Player(const Player& p){
 	this->territoryList = p.territoryList;
 	this->hand = p.hand;
 	this->orderList = p.orderList;
-	*this->armies = *p.armies;
+	this->armies = p.armies;
 }
 
 Player::~Player() {
-	delete this->armies;
 	for (Territory* t : this->territoryList) {
 		delete t;
 	}
@@ -44,7 +44,7 @@ Player::~Player() {
 vector<Territory*> Player::toDefend() {
 	string terrioryName = "";
 	vector<Territory*> defend;
-	cout << "List of your territories to defend: " << endl;
+	cout << "\nList of your territories to defend: " << endl;
 	for (Territory* territory : this->getTerritoryList()) {
 		cout << territory->getTerritoryName() << endl;
 	}
@@ -62,44 +62,44 @@ vector<Territory*> Player::toDefend() {
 	return defend;
 }
 
-vector<Territory*> Player::toAttack(vector<Territory> allTerritories) {
+vector<Territory*> Player::toAttack(vector<Territory*> allTerritories) {
 	vector<Territory*> attack;
-	cout << "List of territories to attack: " << endl;
+	cout << "\nList of territories to attack: " << endl;
 	bool found = false;
-	Territory* enemy;
+	Territory* enemyTerritory;
 	/*
 	
 	
-	ERROR WHEN TRYING TO FIND ALL TERRITORIES THAT DON'T BELONG TO YOU, 
-	IT ONLYS HOWS ONE YOU DON'T OWN.
+	FIND ADJACENT ENEMY TERRITORIES
 	
 	
 	*/
-	for (Territory t : allTerritories) {
-		for (Territory* territory : this->getTerritoryList()) {
-			enemy = territory;
-			if (territory->getTerritoryName() == t.getTerritoryName()) {
+	for (Territory* territory : allTerritories) {
+		for (Territory* playerTerritory : this->getTerritoryList()) {
+			enemyTerritory = territory;
+			if (playerTerritory->getTerritoryName() == territory->getTerritoryName()) {
 				found = true;
 				break;
 			}
 		}
 		if (!found) {
-			attack.push_back(enemy);
-			cout << enemy->getTerritoryName() << endl;
+			attack.push_back(enemyTerritory);
+			cout << enemyTerritory->getTerritoryName() << endl;
 		}
 		found = false;
 	}
 	return attack;
 }
 
-void Player::issueOrder(Deck* deck, vector<Player*> players, vector<Territory> mapTerritories) {
+void Player::issueOrder(Deck* deck, vector<Player*> players, MapLoader* map) {
 	//Create a list of neighboring and your own territories to attack and defend.
-	vector<Territory*> attack = this->toAttack(mapTerritories);
+	cout << "\n\nIt is now " << this->name << "'s turn." << endl;
+	vector<Territory*> attackTerritories = this->toAttack(map->countries);
 	vector<Territory*> defend = this->toDefend();
 	//Now issue deploy orders to the territories to defend for the remaining number of armies.
 	int numDeploy;
-	int availableArimes = *this->armies;
-	cout << "\nCurrent Player:\t" << this->name;
+	int availableArimes = this->armies;
+	cout << "\nCurrent Player:\t" << this->name << endl;
 	while (availableArimes > 0) {
 		for (Territory* territory : defend) {
 			cout << "Remaining armies: ";
@@ -111,7 +111,7 @@ void Player::issueOrder(Deck* deck, vector<Player*> players, vector<Territory> m
 				numDeploy = availableArimes;
 			}
 			//When adding armies to defend your territory, a deploy order must be issued.
-			this->orderList.add(new Deploy(this, false, numDeploy, territory));
+			this->orderList->add(new Deploy(this, false, numDeploy, territory));
 			availableArimes -= numDeploy;
 			cout << endl;
 			cout << numDeploy << " armies are ordered to be deployed to " << territory->getTerritoryName() << endl;
@@ -123,56 +123,62 @@ void Player::issueOrder(Deck* deck, vector<Player*> players, vector<Territory> m
 	//Commence issuing advance orders: moving armies between your own teritories, or issuing an attack
 	cout << "Advance Orders: " << endl;
 	string continueAdvance = "";
-	string baseTerritory;
-	string targetTerritory;
+	string baseTerritoryName;
+	string targetTerritoryName;
 	int armiesMoving = 0;
 	while (continueAdvance != "end") {
-		cout << "Choose your territory: ";
-		cin >> baseTerritory;
-		cout << "Choose a territory to move your armies to attack or defend: ";
-		cin >> targetTerritory;
+		cout << "Choose your territory to move armies from: ";
+		cin >> baseTerritoryName;
+		Territory* baseTerritory = getTerritoryByName(this->getTerritoryList(), baseTerritoryName);
+		cout << "Choose a territory for your armies to attack or defend: ";
+		cin >> targetTerritoryName;
+		//Check both the defend and the attack territories pointer list for the advanced order.
+		Territory* adjacentTerritory = getTerritoryByName(attackTerritories, targetTerritoryName);
+		if (adjacentTerritory == nullptr) {
+			adjacentTerritory = getTerritoryByName(this->getTerritoryList(), targetTerritoryName);
+		}
 		cout << "How many armies would you like to move: ";
 		cin >> armiesMoving;
-		this->orderList.add(new Advance());
+		this->orderList->add(new Advance(this, false, armiesMoving, baseTerritory, adjacentTerritory));
 		cout << "Continue issuing advance orders? Input end to stop." << endl;
 		cin >> continueAdvance;
 	}
 	//From a list of the player's cards, execute one of the orders.
 	cout << this->name + "'s current cards:" << endl;
-	this->getHand().showHand();
+	this->getHand()->showHand();
 	cout << "Select one of the cards by number to issue the corresponding order." << endl;
 	int cardNum = 0;
 	cin >> cardNum;
-	while (cardNum < 1 || cardNum > this->getHand().hand.size()) {
+	while (cardNum < 1 || cardNum > this->getHand()->hand.size()) {
 		cout << "Please try again.";
 		cin >> cardNum;
 	}
-	Card card = this->getHand().play(cardNum - 1, *deck);
+	Card card = this->getHand()->play(cardNum - 1, *deck);
 	//Based card name, issue the respective order, and give the correct respective input to issue the order.
 	if (card.CardType == "airlift") {
 		string sourceTerritory;
-		string enemyTarget;
+		string destinationTarget;
 		int numArmies;
 		cout << "What is the source territory to airlift from: ";
 		cin >> sourceTerritory;
 		cout << "What is the airlift destination: ";
-		cin >> enemyTarget;
+		cin >> destinationTarget;
 		cout << "How many armies would you like to arilift: ";
 		cin >> numArmies;
-		this->orderList.add(new Airlift(this, false, numArmies,
-			getTerritoryByName(defend, sourceTerritory), getTerritoryByName(defend, targetTerritory)));
+		this->orderList->add(new Airlift(this, false, numArmies,
+			getTerritoryByName(this->getTerritoryList(), sourceTerritory), getTerritoryByName(this->getTerritoryList(), destinationTarget)));
 	}
 	else if (card.CardType == "bomb") {
 		string enemyTerritory;
 		cout << "What enemy teritory would you like to target: ";
 		cin >> enemyTerritory;
-		this->orderList.add(new Bomb(this, false, getTerritoryByName(attack, enemyTerritory)));
+		this->orderList->add(new Bomb(this, false, getTerritoryByName(attackTerritories, enemyTerritory)));
 	}
 	else if (card.CardType == "blockade") {
 		string playerTerritory;
 		cout << "Which territory would you like to blockade: ";
 		cin >> playerTerritory;
-		this->orderList.add(new Blockade(this, false, getTerritoryByName(defend, playerTerritory)));
+		this->orderList->add(new Blockade(this, false, getTerritoryByName(this->getTerritoryList(), playerTerritory)));
 	}
 	else if (card.CardType == "negotiate") {
 		string enemyPlayerName;
@@ -185,7 +191,7 @@ void Player::issueOrder(Deck* deck, vector<Player*> players, vector<Territory> m
 				break;
 			}
 		}
-		this->orderList.add(new Negotiate(this, false, enemyPlayer));
+		this->orderList->add(new Negotiate(this, false, enemyPlayer));
 	}
 	cout << "\n" << endl;
 }
@@ -219,15 +225,15 @@ void Player::addTerritory(Territory* territory) {
 	this->territoryList.push_back(territory);
 }
 
-playerHand Player::getHand() {
+playerHand* Player::getHand() {
 	return this->hand;
 }
 
 void Player::addToHand(Card card) {
-	this->hand.add(card);
+	this->hand->add(card);
 }
 
-OrdersList Player::getOrderList() {
+OrdersList* Player::getOrderList() {
 	return orderList;
 }
 
@@ -236,12 +242,12 @@ void Player::noAttack(Player* ally)
 	this->noAttackList.push_back(ally);
 }
 
-int* Player::getArmies() {
+int Player::getArmies() {
 	return this->armies;
 }
 
 void Player::addArmies(int added) {
-	*this->armies += added;
+	this->armies += added;
 }
 
 ostream& operator<<(ostream& os, Player player){
@@ -250,8 +256,8 @@ ostream& operator<<(ostream& os, Player player){
 	for (int i = 0; i < t.size(); i++) {
 		os << t[i];
 	}
-	OrdersList ot = player.getOrderList();
-	ot.display();
+	OrdersList* ot = player.getOrderList();
+	ot->display();
 	return os;
 }
 

@@ -8,7 +8,7 @@
 using namespace std;
 
 /*******************************
-		State Class 
+		State Class
 *******************************/
 string State::getName() {
 	return *name;
@@ -33,7 +33,7 @@ StateStart::~StateStart() {
 	delete this->transition;
 }
 
-State* StateStart::Transition(string command){
+State* StateStart::Transition(string command) {
 	//Verify that the command meets the string to transition, otherwise error.
 	if (command.compare(*this->transition) == 0) {
 		return new StateMapLoad();
@@ -65,7 +65,7 @@ StateMapLoad::~StateMapLoad() {
 }
 
 
-State* StateMapLoad::Transition(string command){
+State* StateMapLoad::Transition(string command) {
 	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionLoad) == 0) {
 		return new StateMapLoad();
@@ -85,7 +85,7 @@ MapLoader* StateMapLoad::LoadMap(string mapName) {
 	//Look through each file in the directory for a matching name.
 	for (filesystem::directory_entry file : filesystem::directory_iterator(path)) {
 		string fileName = file.path().string();
-		fileName = fileName.substr(1,fileName.size() - 1);
+		fileName = fileName.substr(1, fileName.size() - 1);
 		//If mach found, return the map loader, with the file name.
 		if (fileName.compare("./" + mapName) == 0) {
 			mapLoader = new MapLoader(path + fileName);
@@ -123,7 +123,7 @@ StateMapValidate::~StateMapValidate() {
 	delete this->map;
 }
 
-State* StateMapValidate::Transition(string command){
+State* StateMapValidate::Transition(string command) {
 	//Verify that the command meets the string to transition, otherwise error.
 	if (command.compare(*this->transition) == 0) {
 		return new StateAddPlayers();
@@ -153,7 +153,7 @@ StateAddPlayers::~StateAddPlayers() {
 	delete this->transitionPlay;
 }
 
-State* StateAddPlayers::Transition(string command){
+State* StateAddPlayers::Transition(string command) {
 	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionAdd) == 0) {
 		return new StateAddPlayers();
@@ -325,7 +325,7 @@ bool GameEngine::ChangeState(string command) {
 	//Store the user's input.
 	this->userCommand = command;
 	//Get the next state from the current state based on user input.
-	State * s = this->currentState->Transition(command);
+	State* s = this->currentState->Transition(command);
 	//If a valid State object was returned, delete the curent and replace it with new one.
 	if (s != NULL) {
 		delete this->currentState;
@@ -396,9 +396,8 @@ void GameEngine::StartupPhase() {
 	const int numCards = 2 * numPlayers;
 	this->deck->createDeck(numCards);
 	//Begin by distributing the territories to players.
-	vector<Territory> territories = this->map->getCountriesFromMapFile();
+	vector<Territory*> territories = this->map->countries;
 	int numTerritoriesPerPlayer = territories.size() / numPlayers;
-	//vector<Territory*> territoryList = vector<Territory*>();
 	Player* player = this->players[0];
 	int j = 0;
 	for (int i = 0; i < (numTerritoriesPerPlayer * numPlayers); i++) {
@@ -406,11 +405,11 @@ void GameEngine::StartupPhase() {
 			player = this->players[++j];
 		}
 		//Add the territory to the player's list of territories.
-		Territory* t = new Territory(territories[i]);
+		Territory* t = territories[i];
 		player->addTerritory(t);
 		//Assign the player pointer to the territory.
-		territories[i].setPlayer(player);
-		cout << "Player: " + player->getName() << "\tAdded: " + territories[i].getTerritoryName() << endl;
+		t->setPlayer(player);
+		cout << "Player: " + player->getName() << "\tAdded: " + t->getTerritoryName() << endl;
 	}
 	player = nullptr;
 	//Determine random play order.
@@ -422,12 +421,12 @@ void GameEngine::StartupPhase() {
 		cout << "Player: " + player->getName() << endl;
 		//Give each player 50 armies initially to their reinforcement pool.
 		player->addArmies(armiesStart);
-		cout << "Added initial " << *player->getArmies() << " armies to player" << endl;
+		cout << "Added initial " << player->getArmies() << " armies to player" << endl;
 		//Let each playe draw 2 cards from the deck.
 		player->addToHand(this->deck->draw());
 		player->addToHand(this->deck->draw());
 		cout << "The following cards have been added to their hand: " << endl;
-		player->getHand().showHand();
+		player->getHand()->showHand();
 		cout << endl;
 	}
 }
@@ -460,8 +459,16 @@ void GameEngine::reinforcementPhase() {
 	for (Player* player : this->players) {
 		basicReinforcement = floor(player->getTerritoryList().size() / 3);
 		controlBonus = 0;
-		//Determine bonus armies.
+		/*
 		
+		
+		
+		Determine bonus armies.
+
+
+
+
+		*/
 		//By default, no matter how many territories owned, a player will receive three armies.
 		if (basicReinforcement < 3) {
 			basicReinforcement = 3;
@@ -477,7 +484,7 @@ void GameEngine::reinforcementPhase() {
 
 void GameEngine::issueOrdersPhase() {
 	for (Player* player : this->players) {
-		player->issueOrder(this->deck, this->players, this->map->getCountriesFromMapFile());
+		player->issueOrder(this->deck, this->players, this->map);
 	}
 }
 
@@ -489,17 +496,11 @@ void GameEngine::executeOrdersPhase() {
 		playesOrdersDone = 0;
 		int i = 0;
 		for (Player* player : this->players) {
-			OrdersList playerOrderList = player->getOrderList();
-			if (playerOrderList.getList().size() > 1) {
+			if (player->getOrderList()->getList().size() > 0) {
 				//If it is not empty, get the front element.
-				Order* order = playerOrderList.getList()[0];
+				Order* order = player->getOrderList()->getList()[0];
 				//Since the order list is like a queue, remove the first element, and then execute it
-				/*
-				
-				ERROR WHEN TRYING TO REMOVE ORDER FROM LIST.
-				
-				*/
-				playerOrderList.getList().erase(playerOrderList.getList().begin() + i);
+				player->getOrderList()->remove(0);
 				order->execute();
 			}
 			else {

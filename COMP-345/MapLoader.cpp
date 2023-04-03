@@ -57,17 +57,18 @@ void Continents::setContinentWeight() {
 Territory::Territory() {
     continentID=-1;
     territoryName="null";
-    player= nullptr;
+    this->player = nullptr;
     armies=0;
     weight=0;
 }
-
 
 
 Territory::Territory(std::string continentID, std::string territoryName, int countryID) {
     this->continentID=continentID;
     this->territoryName=territoryName;
     this->territoryID=countryID;
+    this->player = nullptr;
+    this->armies = 0;
     this->weight=0;
 }
 
@@ -379,8 +380,10 @@ vector<Territory> MapLoader::getCountriesFromMapFile() {
                 //cout << "word 2 is"<<word1<<endl;
                 //Continents continent (word1, atoi(word2.c_str()), (count+1));
                 Territory terrority (word3, word2, atoi(word1.c_str()));
+                Territory* t = new Territory(word3, word2, atoi(word1.c_str()));
                 //vector<Continents>:: iterator it;
                 terrorities.push_back(terrority);
+                this->countries.push_back(t);
                 count++;
                 getline(inStream, line2);
                 if(line2.empty())

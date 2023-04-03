@@ -145,7 +145,6 @@
     <ClInclude Include="MapLoader.h" />
     <ClInclude Include="Orders.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="State.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Card.cpp" />
@@ -160,7 +159,6 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerDriver.cpp" />
     <ClCompile Include="StartupPhaseDriver.cpp" />
-    <ClCompile Include="State.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

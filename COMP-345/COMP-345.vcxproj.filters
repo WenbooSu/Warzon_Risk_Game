@@ -24,9 +24,6 @@
     <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="State.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MapLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -35,9 +32,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GameEngine.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
     <ClCompile Include="GameEngineDriver.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
@@ -62,9 +56,6 @@
     <ClCompile Include="PlayerDriver.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="State.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
     <ClCompile Include="Orders.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
@@ -72,6 +63,9 @@
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="MaineGameLoopDriver.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameEngine.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>
