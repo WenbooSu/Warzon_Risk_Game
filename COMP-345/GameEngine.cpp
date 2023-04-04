@@ -479,22 +479,37 @@ void GameEngine::reinforcementPhase() {
 		cout << "Player's basic reinforcement = " << basicReinforcement << endl;;
 		cout << "The player will now receive " << totalArmiesAdded << " armies" << endl;;
 		player->addArmies(totalArmiesAdded);
+		player->armiesUsed = 0;
 	}
 }
 
 void GameEngine::issueOrdersPhase() {
-	for (Player* player : this->players) {
-		player->issueOrder(this->deck, this->players, this->map);
+	int playesOrdersDone = 0;
+	string endDecision = "end";
+	string decision;
+	//Iterate in round robin fashion issue order phase until all players are don issuing orders.
+	while (playesOrdersDone < this->players.size()) {
+		playesOrdersDone = 0;
+		for (Player* player : this->players) {
+			cout << "Player: " << player->getName() << ", conitnue issuing orders? Type " << endDecision << " to stop: " << endl;
+			cin >> decision;
+			if (decision != endDecision) {
+				player->issueOrder(this->deck, this->players, this->map);
+			}
+			else {
+				//If that player no longer has orders to execute, count them as done.
+				playesOrdersDone++;
+			}
+		}
 	}
+	this->ChangeState("endissueorders");
 }
-
 
 void GameEngine::executeOrdersPhase() {
 	int playesOrdersDone = 0;
 	//Reset number of players done every iteration, keep iterating until all players are done.
 	while (playesOrdersDone < this->players.size()) {
 		playesOrdersDone = 0;
-		int i = 0;
 		for (Player* player : this->players) {
 			if (player->getOrderList()->getList().size() > 0) {
 				//If it is not empty, get the front element.
@@ -508,7 +523,6 @@ void GameEngine::executeOrdersPhase() {
 				playesOrdersDone++;
 			}
 		}
-		i++;
 	}
 }
 

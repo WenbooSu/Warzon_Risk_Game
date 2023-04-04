@@ -14,6 +14,7 @@ class Player {
 public:
     playerHand* hand;
     OrdersList* orderList;
+    int armiesUsed;
     Player();
     Player(string, vector<Territory*>, playerHand*, OrdersList*);
     Player(const Player&); //copy constructor

@@ -163,7 +163,7 @@ bool Advance::validate()
     vector<Territory*> checkList = getOwner()->getTerritoryList();
     //vector<Territory*> checkList = getOwner()->getTerritoryList();
 
-    if (find(checkList.begin(), checkList.end(), source_territory) != checkList.end())
+    if (find(checkList.begin(), checkList.end(), source_territory) == checkList.end())
         return false;
     //Adjacency
 
@@ -181,9 +181,23 @@ void Advance::execute()
 
         if (find(checkList.begin(), checkList.end(), adjacent_territory) != checkList.end())
         {            
-            adjacent_territory->setArmies(adjacent_territory->getArmies() + army_deploy);
-            source_territory->setArmies(source_territory->getArmies() - army_deploy);
-            cout << "Your army has advanced to friendly territory!" << endl;
+            //Check for the remaining number of armies commanded to deploy from source territory.
+            if (source_territory->getArmies() >= this->army_deploy) {
+                //If the source has enough, move them to the target
+                adjacent_territory->setArmies(adjacent_territory->getArmies() + army_deploy);
+                source_territory->setArmies(source_territory->getArmies() - army_deploy);
+                cout << "Your army has advanced to friendly territory!" << endl;
+            }
+            else if (source_territory->getArmies() <= 0) {
+                //If the source has no armies, move nothing.
+                cout << "No more remaining armies to be moved!" << endl;
+            }
+            else {
+                //If more armies are commanded than what the source contains, move remaining armies from source.
+                adjacent_territory->setArmies(adjacent_territory->getArmies() + source_territory->getArmies());
+                source_territory->setArmies(source_territory->getArmies() - source_territory->getArmies());
+                cout << "Your army has advanced to friendly territory!" << endl;
+            }
         }
         else
         {
@@ -320,11 +334,15 @@ bool Airlift::validate()
 {
     vector<Territory*> checkList = getOwner()->getTerritoryList();
 
-    if (!(find(checkList.begin(), checkList.end(), source_territory) != checkList.end()))
+    if (find(checkList.begin(), checkList.end(), source_territory) == checkList.end()) {
+        cout << "The source territory " << source_territory->getTerritoryName() << " does not belong to you." << endl;
         return false;
+    }
 
-    if (!(find(checkList.begin(), checkList.end(), target_territory) != checkList.end()))
+    if (!(find(checkList.begin(), checkList.end(), target_territory) != checkList.end())) {
+        cout << "The target territory " << target_territory->getTerritoryName() << " does not belong to you." << endl;
         return false;
+    }
 
     return true;
 }
@@ -333,11 +351,27 @@ void Airlift::execute()
 {
     if (validate())
     {
+        int territoryArmies = source_territory->getArmies();
         cout << "Airlifting armies into target territory" << endl;
-        target_territory->setArmies(army_deploy + target_territory->getArmies());
-        source_territory->setArmies(source_territory->getArmies() - army_deploy);
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        cout << "Army airlifted onto the territory!" << endl;
+        //Check that the armies deplaoyed is the number of remaining armies on the territory or less.
+        if (this->army_deploy <= territoryArmies) {
+            //If so, airlift the armies from the source to target territory.
+            target_territory->setArmies(army_deploy + target_territory->getArmies());
+            source_territory->setArmies(source_territory->getArmies() - army_deploy);
+            cout << "Army airlifted onto the territory!" << endl;
+        }
+        else if (territoryArmies <= 0) {
+            //If the sourcce has no armies, move nothing.
+            cout << source_territory->getTerritoryName() << " has no remaining armies!" << endl;
+        }
+        else {
+            //If more armies are commanded to airlift than what the source contains,
+            //airlift all remaining armies from the source territory.
+            target_territory->setArmies(territoryArmies + target_territory->getArmies());
+            source_territory->setArmies(source_territory->getArmies() - territoryArmies);
+            cout << "Army airlifted onto the territory!" << endl;
+        }
     }
     else
     {
