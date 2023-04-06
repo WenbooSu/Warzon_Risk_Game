@@ -124,9 +124,11 @@ void Player::issueOrder(Deck* deck, vector<Player*> players, MapLoader* map) {
 		//From a list of the player's cards, execute one of the orders.
 		cout << "Current cards : " << endl;
 		this->getHand()->showHand();
-		int choice = 0;
-		while (!(choice < 0) && choice == 0 || choice <= this->getHand()->hand.size()) {
+		//Continue until a valid choice has been entered.
+		int choice = -1;
+		while (choice < 0 || choice > this->getHand()->hand.size()) {
 			cout << "Choose an order based on its corresponding number." << endl;
+			cin >> choice;
 			if (choice == 0) {
 				cout << "Advance Orders: " << endl;
 				string baseTerritoryName;

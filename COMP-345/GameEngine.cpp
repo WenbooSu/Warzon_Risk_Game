@@ -491,7 +491,7 @@ void GameEngine::issueOrdersPhase() {
 	while (playesOrdersDone < this->players.size()) {
 		playesOrdersDone = 0;
 		for (Player* player : this->players) {
-			cout << "Player: " << player->getName() << ", conitnue issuing orders? Type " << endDecision << " to stop: " << endl;
+			cout << "\nPlayer: " << player->getName() << ", conitnue issuing orders? Type " << endDecision << " to stop: " << endl;
 			cin >> decision;
 			if (decision != endDecision) {
 				player->issueOrder(this->deck, this->players, this->map);
