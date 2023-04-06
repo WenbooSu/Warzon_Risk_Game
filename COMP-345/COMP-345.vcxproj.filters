@@ -30,6 +30,9 @@
     <ClInclude Include="Orders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CommandProcessing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameEngineDriver.cpp">
@@ -66,6 +69,9 @@
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="GameEngine.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandProcessing.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,8 +1,10 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <sstream>
 #include "MapLoader.h"
 #include "Card.h"
+#include "CommandProcessing.h"
 
 using namespace std;
 
@@ -163,13 +165,19 @@ public:
 */
 class GameEngine {
 private:
-	const string* const commandEnd = new string("end");
+	bool isPlaying;
 	State* currentState;
 	string userCommand;
 	MapLoader* map;
 	vector<Player*> players;
 	Deck* deck;
-	void CommandSplit(string, string values[], int);
+	CommandProcessor* commandProcessor;
+	//The first phase which we give armies depending on the player controlled territory
+	void reinforcementPhase();
+	//The second phase in which the players issue orders
+	void issueOrdersPhase();
+	//The last phase where the orders are executed and ending the players turn
+	void executeOrdersPhase();
 
 public:
 	GameEngine();
@@ -177,21 +185,17 @@ public:
 	/*Copy Constructor*/
 	GameEngine(GameEngine& engine);
 	/*Check if the game should continue based on user input and state.*/
-	bool isPlaying();
+	bool getIsPlaying();
 	/*Return the name of the current state*/
 	string getStateName();
 	/*Given user input, change or deny the state transition.*/
-	bool ChangeState(string command);
+	bool changeState(string command);
 	/*Call the startup method of the current state to commence it part of the startup phase.*/
-	void StartupPhase();
+	void startupPhase();
 	/*Main game loop of the Warzone game, following the startup phase and turn order decided there.*/
 	void mainGameLoop();
-	//The first phase which we give armies depending on the player controlled territory
-	void reinforcementPhase();
-	//The second phase in which the players issue orders
-	void issueOrdersPhase();
-	//The last phase where the orders are executed and ending the players turn
-	void executeOrdersPhase();
+	/*If the game is complete, decide whether to start another game.*/
+	void endPhase();
 	/*Compare name of this current state and parameter's.*/
 	bool operator == (GameEngine* engine);
 	/*Print the engine's current state.*/

@@ -6,7 +6,7 @@ void GameEngineDriver() {
 	const string stateNameEnd = "win";
 	string command;
 	//The main game loop. Continues until the user inputs "end" and someone wins.
-	while (engine.isPlaying()) {
+	while (engine.getIsPlaying()) {
 		//Output the Game Engine Driver UI and the current state.
 		cout << "Game Engine Driver.\n\n"
 			<< engine;
@@ -15,6 +15,6 @@ void GameEngineDriver() {
 		cin >> command;
 		//Before changing state, clear the screen.
 		system("cls");
-		engine.ChangeState(command);
+		engine.changeState(command);
 	}
 }

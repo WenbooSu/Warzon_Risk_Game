@@ -1,6 +1,6 @@
-﻿  Player.cpp
-C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\Player.cpp(129,31): warning C4018: '>': signed/unsigned mismatch
-C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\Player.cpp(152,20): warning C4018: '<=': signed/unsigned mismatch
-C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\Player.cpp(256,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\Player.cpp(266,20): warning C4018: '<': signed/unsigned mismatch
+﻿  GameEngine.cpp
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\GameEngine.cpp(446,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\GameEngine.cpp(479,21): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\GameEngine.cpp(489,26): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\GameEngine.cpp(509,26): warning C4018: '<': signed/unsigned mismatch
   COMP-345.vcxproj -> C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\Debug\COMP-345.exe

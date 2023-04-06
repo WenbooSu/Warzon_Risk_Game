@@ -397,6 +397,17 @@ vector<Territory> MapLoader::getCountriesFromMapFile() {
     return terrorities;
 }
 
+bool MapLoader::bonusContinent(Continents continent, vector<Territory*> playerTeritories) {
+    bool bonus = true;
+    for (Territory* territory : playerTeritories) {
+        if (std::stoi(territory->getContinentID()) != continent.getContinentID()){
+            bonus = false;
+            break;
+        }
+    }
+    return bonus;
+}
+
 void MapLoader::assignArmies(vector<Continents> cv, vector<Territory> tv) {
     for(int i=0; i<tv.size(); i++)
     {

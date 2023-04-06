@@ -2,6 +2,6 @@
 
 int drivers() {
 	GameEngine engine;
-	engine.StartupPhase();
+	engine.startupPhase();
 	return 0;
 }

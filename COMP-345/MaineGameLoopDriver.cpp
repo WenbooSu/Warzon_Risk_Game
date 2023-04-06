@@ -2,15 +2,10 @@
 
 int main() {
 	GameEngine engine;
-	//vector<int> v;
-	//v.push_back(1);
-	//v.push_back(2);
-	//v.push_back(3);
-	//int* i = &v[0];
-	//cout << *i << endl;
-	//v.erase(v.begin());
-	//cout << *i << endl;
-	engine.StartupPhase();
-	engine.mainGameLoop();
+	while (engine.getIsPlaying()) {
+	/*	engine.startupPhase();
+		engine.mainGameLoop();*/
+		engine.endPhase();
+	}
 	return 0;
 }

@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Card.h" />
+    <ClInclude Include="CommandProcessing.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="MapLoader.h" />
     <ClInclude Include="Orders.h" />
@@ -149,6 +150,7 @@
   <ItemGroup>
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="CardDriver.cpp" />
+    <ClCompile Include="CommandProcessing.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameEngineDriver.cpp" />
     <ClCompile Include="MaineGameLoopDriver.cpp" />

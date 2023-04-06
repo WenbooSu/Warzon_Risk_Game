@@ -1,7 +1,6 @@
 #include <iostream>
 #include <conio.h>
 #include <filesystem>
-#include <sstream>
 #include <algorithm>
 #include <random>
 #include "GameEngine.h"
@@ -262,8 +261,8 @@ State* StateExecuteOrders::Transition(string command) {
 StateWin::StateWin() {
 	//Upon instantiation, set name and commands to both transition states.
 	this->name = new string("Win");
-	this->transitionEnd = new string("end");
-	this->transitionRestart = new string("play");
+	this->transitionEnd = new string("quit");
+	this->transitionRestart = new string("replay");
 }
 
 StateWin::~StateWin() {
@@ -289,19 +288,22 @@ State* StateWin::Transition(string command) {
 		Engine Class
 *******************************/
 GameEngine::GameEngine() {
-	this->currentState = new StateStart();
+	this->currentState = new StateWin();
 	this->map = nullptr;
 	this->deck = new Deck();
+	this->commandProcessor = new CommandProcessor();
+	this->isPlaying = true;
 }
 
 GameEngine::GameEngine(GameEngine& engine) {
 	this->currentState = engine.currentState;
 	this->map = nullptr;
 	this->deck = new Deck();
+	this->commandProcessor = engine.commandProcessor;
+	this->isPlaying = true;
 }
 
 GameEngine::~GameEngine() {
-	delete this->commandEnd;
 	delete this->currentState;
 	delete this->map;
 	//Go through each play in the instance's player vector and delete them.
@@ -309,19 +311,18 @@ GameEngine::~GameEngine() {
 		delete p;
 	}
 	delete this->deck;
+	delete this->commandProcessor;
 }
 
-bool GameEngine::isPlaying() {
-	/*Check if the command matches the end game command, and
-	  whether the current state can be converted to win state, if not, the current state is already win state.*/
-	return this->userCommand.compare(*this->commandEnd) != 0 || dynamic_cast<StateWin*>(currentState) == nullptr;
+bool GameEngine::getIsPlaying() {
+	return this->isPlaying;
 }
 
 string GameEngine::getStateName() {
 	return this->currentState->getName();
 }
 
-bool GameEngine::ChangeState(string command) {
+bool GameEngine::changeState(string command) {
 	//Store the user's input.
 	this->userCommand = command;
 	//Get the next state from the current state based on user input.
@@ -335,8 +336,9 @@ bool GameEngine::ChangeState(string command) {
 	return false;
 }
 
-void GameEngine::StartupPhase() {
+void GameEngine::startupPhase() {
 	string input = "";
+	vector<string> commands;
 	bool validMap = false;
 	const int numCommands = 2;
 	const int minPlayers = 2;
@@ -345,14 +347,14 @@ void GameEngine::StartupPhase() {
 	//Loop until the startup phase has been completed.
 	while (dynamic_cast<StateAssign*>(this->currentState) == nullptr) {
 		cout << "\n\nState: " << this->currentState->getName() << endl;
-		cout << "Please enter a command" << endl;
 		//Get the user's command and input.
-		getline(cin, input);
+		//getline(cin, input);
+		input = this->commandProcessor->getCommand().getCommandName();
 		//Split the string: first is the command, second is any input such as map name or player name.
-		string commands[numCommands];
-		CommandSplit(input, commands, numCommands);
-		//If possible, change state, and capture the result.
-		bool validCommand = this->ChangeState(commands[0]);
+		commands = this->commandProcessor->commandSplit();
+		//Validate the command and change state if possible.
+		bool validCommand = this->commandProcessor->validate(this->getStateName());
+		this->changeState(commands[0]);
 		//Based on changed state changed to, do correspoinding part of the startup phase.
 		if (StateMapLoad* s = dynamic_cast<StateMapLoad*>(this->currentState); s != nullptr && validCommand) {
 			this->map = s->LoadMap(commands[1]);
@@ -368,9 +370,8 @@ void GameEngine::StartupPhase() {
 				this->currentState = new StateMapLoad();
 			}
 		}
-		//If the map in load state is invalid, inform the user and stay in load map state.
-		else if (!validMap) {
-			cout << "Please enter a valid map." << endl;
+		//If the map in load state is invalid, stay in load map state.
+		else if (StateMapValidate* s = dynamic_cast<StateMapValidate*>(this->currentState); s != nullptr && validCommand && !validMap) {
 			this->currentState = new StateMapLoad();
 		}
 		if (dynamic_cast<StateAddPlayers*>(this->currentState) != nullptr && validCommand) {
@@ -436,7 +437,7 @@ void GameEngine::mainGameLoop() {
 	while (dynamic_cast<StateWin*>(currentState) == nullptr) {
 		//Begin each cycle of the main game loop with the reinforcement phase.
 		this->reinforcementPhase();
-		this->ChangeState("issueorder");
+		this->changeState("issueorder");
 		//Now, for each player, in order, allow them them to issue orders.
 		this->issueOrdersPhase();
 		//Once all the orders have been issued, execute them in round robin fashion.
@@ -459,19 +460,16 @@ void GameEngine::reinforcementPhase() {
 	for (Player* player : this->players) {
 		basicReinforcement = floor(player->getTerritoryList().size() / 3);
 		controlBonus = 0;
-		/*
-		
-		
-		
-		Determine bonus armies.
-
-
-
-
-		*/
-		//By default, no matter how many territories owned, a player will receive three armies.
 		if (basicReinforcement < 3) {
 			basicReinforcement = 3;
+		}
+		//Go through each continent, and verify whether they earn bonus for controlling all its territories.
+		vector<Continents> continents = this->map->getContinentsFromMapFile();
+		for (Continents continent : continents) {
+			if (this->map->bonusContinent(continent, player->getTerritoryList())) {
+				//Add bonuc based on constant value.
+				controlBonus += 2;
+			}
 		}
 		totalArmiesAdded = basicReinforcement + controlBonus;
 		cout << "For player: " + player->getName() << endl;
@@ -502,7 +500,7 @@ void GameEngine::issueOrdersPhase() {
 			}
 		}
 	}
-	this->ChangeState("endissueorders");
+	this->changeState("endissueorders");
 }
 
 void GameEngine::executeOrdersPhase() {
@@ -526,6 +524,25 @@ void GameEngine::executeOrdersPhase() {
 	}
 }
 
+void GameEngine::endPhase() {
+	string input;
+	bool validCommand = false;
+	cout << "Would you like to continue playing? Enter \"end\" to stop." << endl;
+	//Loop until the user enters a command to end or restart during the win phase.
+	while (!validCommand) {
+		input = this->commandProcessor->getCommand().getCommandName();
+		//Validate the command and change state if possible.
+		validCommand = this->commandProcessor->validate(this->getStateName());
+		this->changeState(input);
+		if (validCommand && dynamic_cast<StateStart*>(this->currentState) != nullptr) {
+			this->isPlaying = true;
+		}
+		else if (validCommand){
+			this->isPlaying = false;
+		}
+	}
+}
+
 bool GameEngine::operator==(GameEngine* engine) {
 	return this->getStateName() == engine->getStateName();
 }
@@ -538,15 +555,6 @@ ostream& operator<<(ostream& output, const GameEngine& engine) {
 istream& operator>>(istream& input, GameEngine& engine) {
 	string command;
 	input >> command;
-	engine.ChangeState(command);
+	engine.changeState(command);
 	return input;
-}
-
-void GameEngine::CommandSplit(string command, string values[], const int num) {
-	stringstream stream(command);
-	string s;
-	for (int i = 0; i < num; i++) {
-		getline(stream, s, ' ');
-		values[i] = s;
-	}
 }
