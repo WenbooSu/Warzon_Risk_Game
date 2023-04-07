@@ -126,7 +126,8 @@ void Player::issueOrder(Deck* deck, vector<Player*> players, MapLoader* map) {
 		this->getHand()->showHand();
 		//Continue until a valid choice has been entered.
 		int choice = -1;
-		while (choice < 0 || choice > this->getHand()->hand.size()) {
+		int numCards = this->getHand()->hand.size();
+		while (choice < 0 || choice - 1 > numCards) {
 			cout << "Choose an order based on its corresponding number." << endl;
 			cin >> choice;
 			if (choice == 0) {
@@ -149,7 +150,7 @@ void Player::issueOrder(Deck* deck, vector<Player*> players, MapLoader* map) {
 				this->orderList->add(new Advance(this, false, armiesMoving, baseTerritory, adjacentTerritory));
 				cout << "Continue issuing advance orders? Input end to stop." << endl;
 			}
-			else if (choice <= this->getHand()->hand.size() && this->getHand()->hand.size() > 0) {
+			else if (choice <= this->getHand()->hand.size() && this->getHand()->hand.size() > 0 && choice > 0) {
 				Card card = this->getHand()->play(choice - 1, *deck);
 				//Based card name, issue the respective order, and give the correct respective input to issue the order.
 				if (card.CardType == "airlift") {

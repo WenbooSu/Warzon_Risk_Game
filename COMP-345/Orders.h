@@ -2,13 +2,14 @@
 
 #include <string>
 #include <queue>
+#include "LoggingObserver.h"
 
 using namespace std;
 
 class Player; //Forward declaration of the Player class
 class Territory; //Forward declaration of the Territory class
 
-class Order
+class Order : public Subject, public ILoggable
 {
 public:
     //Constructors
@@ -23,15 +24,18 @@ public:
     //Methods
     virtual bool validate() = 0;
     virtual void execute() = 0;
-
+    std::string stringToLog(const std::string&);
     friend ostream& operator << (ostream& out, const Order& o);
+
+protected:
+    string effect;
 
 private:
     Player *owner;
     bool if_executed;
 };
 
-class OrdersList //A list object that holds Order objects
+class OrdersList : public Subject, public ILoggable //A list object that holds Order objects
 {
 public:
     //Constructors
@@ -46,6 +50,7 @@ public:
     void move(int oldPos, int newPos);
     void remove(int pos);
     void display();//Might have to take out
+    std::string stringToLog(const std::string&);
 
 private:
     vector<Order*> list{};

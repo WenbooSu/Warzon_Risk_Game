@@ -1,16 +1,16 @@
 //
 // Created by Administrator on 2023/3/17.
 //
-#include <string>
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include "LoggingObserver.h"
 using namespace std;
 
 #ifndef A2_COMMANDPROCESSING_H
 #define A2_COMMANDPROCESSING_H
 
-class Command
+class Command : public Subject, public ILoggable
 {
 private:
     string command;
@@ -23,10 +23,11 @@ public:
     string getCommandName();
     string getEffect();
     void saveEffect(string); //set effect
+    string stringToLog(const std::string& output);
 };
 
 
-class CommandProcessor
+class CommandProcessor : public Subject, public ILoggable
 {
 private:
     vector<Command> commandList;
@@ -43,6 +44,7 @@ public:
     string nextState(string);
     /*Return a vector, splitting the most recent command based on command and parameter*/
     vector<string> commandSplit();
+    string stringToLog(const std::string& output);
 };
 
 class FileLineReader

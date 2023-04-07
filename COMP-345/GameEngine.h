@@ -5,6 +5,7 @@
 #include "MapLoader.h"
 #include "Card.h"
 #include "CommandProcessing.h"
+#include "LoggingObserver.h"
 
 using namespace std;
 
@@ -13,12 +14,15 @@ using namespace std;
 * Description: This is an abstract class that every state 
 *              will inherit from.
 */
-class State {
+class State : public Subject, public ILoggable{
 protected:
 	const string* name;
 	/*Default error message output.*/
 	State* invalidCommmand();
+	string stringToLog(const string&);
 public:
+	State();
+	~State();
 	/*Return the name of the state.*/
 	string getName();
 	/*Transition to state based on user input.*/
@@ -163,7 +167,7 @@ public:
 * Base class
 * Description: This class controls and manages the game states.
 */
-class GameEngine {
+class GameEngine : public Subject, public ILoggable {
 private:
 	bool isPlaying;
 	State* currentState;
@@ -178,6 +182,7 @@ private:
 	void issueOrdersPhase();
 	//The last phase where the orders are executed and ending the players turn
 	void executeOrdersPhase();
+	string stringToLog(const string&);
 
 public:
 	GameEngine();

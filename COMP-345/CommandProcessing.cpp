@@ -31,14 +31,19 @@ string Command::getCommandName() {
 
 
 string Command::getEffect() {
+    this->notify(stringToLog(this->effect));
     return this->effect;
 }
 
 
 void Command::saveEffect(string effect) {
+    this->notify(stringToLog(this->effect) + "is a saved effect");
     this->effect = std::move(effect);
 }
 
+string Command::stringToLog(const string& output) {
+    return "Command " + output;
+}
 
 Command::~Command() {
 
@@ -48,6 +53,7 @@ Command::~Command() {
 
 void CommandProcessor::saveCommand(string commandStr) {
     Command cmd(commandStr);
+    this->notify(stringToLog(cmd.getCommandName()) + "is a saved comand ");
     commandList.push_back(cmd);
 }
 
@@ -188,6 +194,10 @@ vector<string> CommandProcessor::commandSplit() {
     return values;
 }
 
+string CommandProcessor::stringToLog(const string& output) {
+    return "Command processed " + output;
+}
+
 void CommandProcessor::traverseCommands() {
     cout<< "Command Records:"<< endl;
     for (int i=0; i<commandList.size(); i++)
@@ -208,11 +218,6 @@ FileLineReader::FileLineReader() {
     this->inputFile = nullptr;
     this->fileName="";
 }
-
-/*FileLineReader::FileLineReader(const FileLineReader *flr) {
-    this->inputFile = flr->inputFile;
-    this->fileName = flr->fileName;
-}*/
 
 string FileLineReader::readLineFromFile(ifstream& file) {
     string line;

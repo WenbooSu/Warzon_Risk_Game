@@ -9,6 +9,14 @@ using namespace std;
 /*******************************
 		State Class
 *******************************/
+State::State(){
+	this->addObserver(this);
+}
+
+State::~State() {
+	this->removeObserver(this);
+}
+
 string State::getName() {
 	return *name;
 }
@@ -18,6 +26,10 @@ State* State::invalidCommmand() {
 	return nullptr;
 }
 
+string State::stringToLog(const string &output) {
+	return "State has transitioned to " + output;
+}
+
 /*******************************
 	State Start Class
 *******************************/
@@ -25,6 +37,7 @@ StateStart::StateStart() {
 	//Upon instantiation, set name and command to transition state.
 	this->name = new string("Start");
 	this->transition = new string("loadmap");
+	this->addObserver(this);
 }
 
 StateStart::~StateStart() {
@@ -35,6 +48,7 @@ StateStart::~StateStart() {
 State* StateStart::Transition(string command) {
 	//Verify that the command meets the string to transition, otherwise error.
 	if (command.compare(*this->transition) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateMapLoad();
 	}
 	else {
@@ -52,7 +66,7 @@ void StateStart::Startup() {
 *******************************/
 StateMapLoad::StateMapLoad() {
 	//Upon instantiation, set name and command to both transition states.
-	this->name = new string("Map Load");
+	this->name = new string("Map Loaded");
 	this->transitionLoad = new string("loadmap");
 	this->transitionValidate = new string("validatemap");
 }
@@ -67,9 +81,11 @@ StateMapLoad::~StateMapLoad() {
 State* StateMapLoad::Transition(string command) {
 	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionLoad) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateMapLoad();
 	}
 	else if (command.compare(*this->transitionValidate) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateMapValidate();
 	}
 	else {
@@ -125,6 +141,7 @@ StateMapValidate::~StateMapValidate() {
 State* StateMapValidate::Transition(string command) {
 	//Verify that the command meets the string to transition, otherwise error.
 	if (command.compare(*this->transition) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateAddPlayers();
 	}
 	else {
@@ -155,9 +172,11 @@ StateAddPlayers::~StateAddPlayers() {
 State* StateAddPlayers::Transition(string command) {
 	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionAdd) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateAddPlayers();
 	}
 	else if (command.compare(*this->transitionPlay) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateAssign();
 	}
 	else {
@@ -186,6 +205,7 @@ StateAssign::~StateAssign() {
 State* StateAssign::Transition(string command) {
 	//Verify that the command meets transition string, otherwise error.
 	if (command.compare(*this->transition) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateIssueOrders();
 	}
 	else {
@@ -211,9 +231,11 @@ StateIssueOrders::~StateIssueOrders() {
 State* StateIssueOrders::Transition(string command) {
 	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionIssueOrder) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateIssueOrders();
 	}
 	else if (command.compare(*this->transitionExecuteOrder) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateExecuteOrders();
 	}
 	else {
@@ -242,12 +264,15 @@ StateExecuteOrders::~StateExecuteOrders() {
 State* StateExecuteOrders::Transition(string command) {
 	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionExecuteOrder) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateExecuteOrders();
 	}
 	else if (command.compare(*this->transitionEndOrders) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateAssign();
 	}
 	else if (command.compare(*this->transitionWin) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateWin();
 	}
 	else {
@@ -274,9 +299,11 @@ StateWin::~StateWin() {
 State* StateWin::Transition(string command) {
 	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionEnd) == 0) {
+		this->notify(this->stringToLog(command));
 		return nullptr;
 	}
 	else if (command.compare(*this->transitionRestart) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateStart();
 	}
 	else {
@@ -288,7 +315,7 @@ State* StateWin::Transition(string command) {
 		Engine Class
 *******************************/
 GameEngine::GameEngine() {
-	this->currentState = new StateWin();
+	this->currentState = new StateStart();
 	this->map = nullptr;
 	this->deck = new Deck();
 	this->commandProcessor = new CommandProcessor();
@@ -337,6 +364,17 @@ bool GameEngine::changeState(string command) {
 }
 
 void GameEngine::startupPhase() {
+	//Delete log file if it currently exists, otherwise, create it.
+	fstream stream;
+	stream.open(this->filePath);
+	if (!stream.is_open()) {
+		stream << "Startup phase." << endl;
+	}
+	else {
+		const char* file = this->filePath.c_str();
+		remove(file);
+	}
+	stream.close();
 	string input = "";
 	vector<string> commands;
 	bool validMap = false;
@@ -363,6 +401,9 @@ void GameEngine::startupPhase() {
 			if (validMap) {
 				this->map->showMap();
 			}
+			else {
+				cout << "Map file not found. Please enter an existing map before validation." << endl;
+			}
 		}
 		if (StateMapValidate* s = dynamic_cast<StateMapValidate*>(this->currentState); s != nullptr && validCommand && validMap) {
 			//If the map is invalid, stay in the map load state.
@@ -372,6 +413,7 @@ void GameEngine::startupPhase() {
 		}
 		//If the map in load state is invalid, stay in load map state.
 		else if (StateMapValidate* s = dynamic_cast<StateMapValidate*>(this->currentState); s != nullptr && validCommand && !validMap) {
+			cout << "Map does not exist, please enter an existing map before validating it." << endl;
 			this->currentState = new StateMapLoad();
 		}
 		if (dynamic_cast<StateAddPlayers*>(this->currentState) != nullptr && validCommand) {
@@ -522,6 +564,7 @@ void GameEngine::executeOrdersPhase() {
 			}
 		}
 	}
+	this->changeState("endexecorders");
 }
 
 void GameEngine::endPhase() {

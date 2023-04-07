@@ -3,8 +3,8 @@
 int main() {
 	GameEngine engine;
 	while (engine.getIsPlaying()) {
-	/*	engine.startupPhase();
-		engine.mainGameLoop();*/
+		engine.startupPhase();
+		engine.mainGameLoop();
 		engine.endPhase();
 	}
 	return 0;
