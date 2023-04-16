@@ -3,7 +3,6 @@
 #include<iostream>
 #include <algorithm>
 #include "Player.h"
-#include "MapLoader.h"
 
 using namespace std;
 
@@ -21,6 +20,14 @@ Player::Player(){
 Player::Player(string name, vector<Territory*> territoryList, playerHand* hand, OrdersList* ordersList){
 	this->name = name;
 	this->territoryList = territoryList;
+	this->hand = hand;
+	this->orderList = orderList;
+	this->armies = 0;
+}
+
+Player::Player(std::string name, Map* map, playerHand* hand, OrdersList* ordersList) {
+	this->name = name;
+	this->THE_GAME_MAP = map;
 	this->hand = hand;
 	this->orderList = orderList;
 	this->armies = 0;
@@ -275,4 +282,25 @@ vector<Territory*> Player::compareTerritoryList(vector<Territory*> fullT1, vecto
 		}
 	}
 	return terriortyD;
+}
+
+void Player::setPlayerStrategy(PlayerStrategy* psp) {
+	this->ps = psp;
+}
+
+Map* ::Player::getMap() {
+	return this->THE_GAME_MAP;
+}
+
+bool Player::beingAttacked() {
+	int current = this->armies_record[this->armies_record.size() - 1];
+	int last = this->armies_record[this->armies_record.size() - 2];
+	if (current < last)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

@@ -12,7 +12,7 @@ public:
     virtual Territory* toDefend() = 0;
     void setPlayer(Player*);
     Player* getPlayer();
-    virtual void changeStrategy();
+    //virtual void changeStrategy();
 private:
     Player* player;
 };
@@ -24,7 +24,7 @@ public:
     Territory* toDefend();
 };
 
-class NeutralPlayerStrategy:: public PlayerStrategy{
+class NeutralPlayerStrategy: public PlayerStrategy{
 public:
     NeutralPlayerStrategy();
     void issueOrder()=0;

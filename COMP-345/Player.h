@@ -9,14 +9,20 @@
 using namespace std;
 
 class Territory;    //Forward declaration of the class. The include for Mapload.h is in the cpp file for Player.
+class PlayerStrategy;
 
 class Player {
 public:
     playerHand* hand;
     OrdersList* orderList;
     int armiesUsed;
+    PlayerStrategy* ps; //NEW
+    Map* THE_GAME_MAP; //NEW
+    vector<int> armies_record; //NEW, to determine being attacked or not
+
     Player();
     Player(string, vector<Territory*>, playerHand*, OrdersList*);
+    Player(string name, Map* map, playerHand* hand, OrdersList* ordersList);
     Player(const Player&); //copy constructor
     ~Player();
 
@@ -39,6 +45,10 @@ public:
     vector<Territory*> compareTerritoryList(vector<Territory*>, vector<Territory*>);
     int getArmies();
     void addArmies(int);
+
+    void setPlayerStrategy(PlayerStrategy* psp);
+    Map* getMap();
+    bool beingAttacked();
 
 private:
     string name;

@@ -74,6 +74,7 @@ public:
     bool validate();
     bool continentsValidate();
     void check4Continents(vector<Territory> vt, vector<Continents> vc);
+    vector<vector<Territory>> getMatrix();
 };
 
 class MapLoader
@@ -94,8 +95,8 @@ public:
     vector<Territory*> countries;
     void assignArmies(vector<Continents> cv, vector<Territory> tv);
     void showMap();
-
     bool verifyMapFile();
+    Map* getMap();
 };
 
 

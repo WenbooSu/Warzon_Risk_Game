@@ -10,11 +10,6 @@
 #include <vector>
 #include "MapLoader.h"
 
-/*Player::Player() {
-
-
-}*/
-
 Continents::Continents() {
     this->continentName="none";
     this->continentArmies=0;
@@ -249,20 +244,10 @@ bool Map::continentsValidate() {
                 if(matrix[i][j].getGraphWeight()==1)
                 {
                     cv2d[atoi((matrix[i][j].getContinentID()).c_str())-1][atoi((matrix[j][i].getContinentID()).c_str())-1].setContinentWeight();
-                    //cv2d[j][i].setContinentWeight();
                 }
             }
         }
-        /*cout<<"error check here"<<endl;
-        for(int i=0; i<cv2d.size(); i++)
-        {
-            for(int j=0; j<cv2d.size(); j++)
-            {
-                cout<<cv2d[i][j].getContinentWeight()<<" ";
-            }
-            cout<<endl;
-        }*/
-    vector<bool> visited (cv2d.size(), false);
+        vector<bool> visited (cv2d.size(), false);
         DFS4Continents(0,visited,cv2d.size(),cv2d);
         for(int i=0; i<cv2d.size(); i++)
         {
@@ -295,6 +280,10 @@ void Map::toString() {
         }
         cout<<endl;
     }
+}
+
+vector<vector<Territory>> Map::getMatrix() {
+    return this->matrix;
 }
 
 MapLoader::MapLoader() {
@@ -503,4 +492,8 @@ bool MapLoader::verifyMapFile() {
         cout<< "The Map File is NOT Valid"<<endl;
         return false;
     }
+}
+
+Map* MapLoader::getMap() {
+    return &this->map;
 }

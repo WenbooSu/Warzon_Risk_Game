@@ -58,7 +58,6 @@ void CheaterPlayerStrategy::issueOrder() {
     cout<< "Cheater Player No Order"<<endl;
 }
 
-
 /*
  * Aggressive Player
  */
@@ -82,7 +81,6 @@ void AggressivePlayerStrategy::issueOrder() {
 
 NeutralPlayerStrategy::NeutralPlayerStrategy() = default;
 
-
 void NeutralPlayerStrategy::issueOrder() {
     cout<< "Neutral Player No Order"<<endl;
 }
@@ -90,16 +88,18 @@ void NeutralPlayerStrategy::issueOrder() {
 void NeutralPlayerStrategy::changeStrategy()  {
     if(this->getPlayer()->beingAttacked())
     {
-        this->getPlayer()->setPlayerStrategy();
+        this->getPlayer()->setPlayerStrategy(this);
     }
 }
 
 Territory* NeutralPlayerStrategy::toDefend() {
 
+    return nullptr;
 }
 
 Territory* NeutralPlayerStrategy::toAttack() {
 
+    return nullptr;
 }
 
 
