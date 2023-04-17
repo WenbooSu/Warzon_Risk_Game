@@ -447,16 +447,16 @@ void GameEngine::startupPhase() {
 			player->ps = new HumanPlayerStrategy(player);
 			break;
 		case 2:
-			player->ps = new AggressivePlayerStrategy();
+			player->ps = new AggressivePlayerStrategy(player);
 			break;
 		case 3:
-			player->ps = new BenevolentPlayerStrategy();
+			player->ps = new BenevolentPlayerStrategy(player);
 			break;
 		case 4:
-			player->ps = new NeutralPlayerStrategy();
+			player->ps = new NeutralPlayerStrategy(player);
 			break;
 		case 5:
-			player->ps = new CheaterPlayerStrategy();
+			player->ps = new CheaterPlayerStrategy(player);
 			break;
 		default:
 			player->ps = new HumanPlayerStrategy(player);
@@ -548,6 +548,7 @@ void GameEngine::reinforcementPhase() {
 		cout << "The player will now receive " << totalArmiesAdded << " armies" << endl;;
 		player->addArmies(totalArmiesAdded);
 		player->armiesUsed = 0;
+		player->issueOrderDone = false;
 	}
 }
 
@@ -559,9 +560,7 @@ void GameEngine::issueOrdersPhase() {
 	while (playesOrdersDone < this->players.size()) {
 		playesOrdersDone = 0;
 		for (Player* player : this->players) {
-			cout << "\nPlayer: " << player->getName() << ", conitnue issuing orders? Type " << endDecision << " to stop: " << endl;
-			cin >> decision;
-			if (decision != endDecision) {
+			if (!player->issueOrderDone) {
 				player->issueOrder(this->deck, this->players, this->mapLoader->getMap());
 			}
 			else {

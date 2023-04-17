@@ -1,7 +1,6 @@
 ﻿  PlayerStrategy.cpp
 C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\PlayerStrategy.cpp(93,20): warning C4018: '<=': signed/unsigned mismatch
-C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\PlayerStrategy.cpp(159,27): warning C4018: '<': signed/unsigned mismatch
-C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\PlayerStrategy.cpp(277,19): warning C4018: '<': signed/unsigned mismatch
-C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\PlayerStrategy.cpp(284,19): warning C4018: '<': signed/unsigned mismatch
-C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\PlayerStrategy.cpp(287,23): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\PlayerStrategy.cpp(164,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\PlayerStrategy.cpp(213,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\COMP-345\PlayerStrategy.cpp(393,21): warning C4018: '<': signed/unsigned mismatch
   COMP-345.vcxproj -> C:\Users\ZachT\Desktop\Concordia\Winter 2023\Comp 345\COMP-345\Debug\COMP-345.exe

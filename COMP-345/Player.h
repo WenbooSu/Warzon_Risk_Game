@@ -21,6 +21,7 @@ public:
     vector<int> armies_record; //NEW, to determine being attacked or not
     vector<Player*> players;
     Deck* deck;
+    bool issueOrderDone;
 
     Player();
     Player(string, vector<Territory*>, playerHand*, OrdersList*);

@@ -28,7 +28,7 @@ public:
 
 class AggressivePlayerStrategy: public PlayerStrategy{
 public:
-    AggressivePlayerStrategy();
+    AggressivePlayerStrategy(Player*);
     void issueOrder();
     vector<Territory*> toAttack();
     vector<Territory*> toDefend();
@@ -36,6 +36,7 @@ public:
 
 class BenevolentPlayerStrategy : public PlayerStrategy {
 public:
+    BenevolentPlayerStrategy(Player*);
     void issueOrder();
     vector<Territory*> toAttack();
     vector<Territory*> toDefend();
@@ -43,6 +44,7 @@ public:
 
 class CheaterPlayerStrategy: public PlayerStrategy{
 public:
+    CheaterPlayerStrategy(Player*);
     void issueOrder();
     vector<Territory*> toAttack();
     vector<Territory*> toDefend();
@@ -50,7 +52,7 @@ public:
 
 class NeutralPlayerStrategy: public PlayerStrategy{
 public:
-    NeutralPlayerStrategy();
+    NeutralPlayerStrategy(Player*);
     void issueOrder();
     vector<Territory*> toAttack();
     vector<Territory*> toDefend();

@@ -135,6 +135,13 @@ void HumanPlayerStrategy::issueOrder() {
 			}
 		}
 	}
+	string endDecision = "end";
+	string decision;
+	cout << "\nPlayer: " << player->getName() << ", conitnue issuing orders afterwards? Type " << endDecision << " to stop: " << endl;
+	cin >> decision;
+	if (decision == endDecision) {
+		this->player->issueOrderDone = true;
+	}
 }
 
 vector<Territory*> HumanPlayerStrategy::toDefend() {
@@ -152,14 +159,10 @@ vector<Territory*> HumanPlayerStrategy::toDefend() {
 vector<Territory*> HumanPlayerStrategy::toAttack() {
     vector<Territory*> attack;
     cout << "\nList of territories to attack: " << endl;
-
-    for (Territory* conquered : this->player->getTerritoryList())
-    {
+    for (Territory* conquered : this->player->getTerritoryList()){
 		int row = conquered->getTerritoryID() - 1;
-        for (int j = 0; j < this->getPlayer()->getMap()->getMatrix()[row].size(); j++)
-        {
-            if (this->getPlayer()->getMap()->getMatrix()[row][j].getGraphWeight() == 1)
-            {
+        for (int j = 0; j < this->getPlayer()->getMap()->getMatrix()[row].size(); j++) {
+            if (this->getPlayer()->getMap()->getMatrix()[row][j].getGraphWeight() == 1) {
 				string territoryName = this->getPlayer()->getMap()->getMatrix()[row][j].getTerritoryName();
 				bool ownsTerritory = false;
 				for (Territory* t :  this->getPlayer()->getTerritoryList()) {
@@ -192,37 +195,142 @@ vector<Territory*> HumanPlayerStrategy::toAttack() {
 /*
  * Aggressive Player
  */
-AggressivePlayerStrategy::AggressivePlayerStrategy() = default;
+AggressivePlayerStrategy::AggressivePlayerStrategy(Player* player) {
+	this->player = player;
+}
 
 vector<Territory*> AggressivePlayerStrategy::toAttack() {
-
-    return this->territories;
+	vector<Territory*> attack;
+	//Get the teritory with the strongest army.
+	Territory* strongestTerritory = this->player->getTerritoryList()[0];
+	for (Territory* t : this->player->getTerritoryList()) {
+		if (t->getArmies() >= strongestTerritory->getArmies()) {
+			strongestTerritory = t;
+		}
+	}
+	//Attack the first enemy territory that the payer's strongest army can find.
+	int row = strongestTerritory->getTerritoryID() - 1;
+	for (int j = 0; j < this->getPlayer()->getMap()->getMatrix()[row].size(); j++) {
+		if (this->getPlayer()->getMap()->getMatrix()[row][j].getGraphWeight() == 1) {
+			string territoryName = this->getPlayer()->getMap()->getMatrix()[row][j].getTerritoryName();
+			bool ownsTerritory = false;
+			for (Territory* t : this->getPlayer()->getTerritoryList()) {
+				if (territoryName == t->getTerritoryName()) {
+					ownsTerritory = true;
+					break;
+				}
+			}
+			if (!ownsTerritory) {
+				bool alreadyDisplayed = false;
+				Territory* t = this->player->getTerritoryByName(this->player->THE_GAME_MAP->countries, territoryName);
+				for (Territory* displayed : attack) {
+					if (territoryName == displayed->getTerritoryName()) {
+						alreadyDisplayed = true;
+						break;
+					}
+				}
+				if (!alreadyDisplayed) {
+					attack.push_back(t);
+				}
+			}
+		}
+		}
+	return attack;
 }
 
 vector<Territory*> AggressivePlayerStrategy::toDefend() {
-
-    return this->territories;
+	string terrioryName = "";
+	vector<Territory*> defend;
+	for (Territory* territory : player->getTerritoryList()) {
+		cout << territory->getTerritoryName() << "\t\tArmies: " << territory->getArmies() << endl;
+		defend.push_back(territory);
+	}
+	return defend;
 }
 
 void AggressivePlayerStrategy::issueOrder() {
-    cout<<"TBC"<<endl;
+	int availableArimes = player->getArmies() - player->armiesUsed;
+	if (availableArimes > 0) {
+		//Begin by creating a deploy order, deplyong all armies on the strongest territory.
+		vector<Territory*> defendList = this->toDefend();
+		vector<Territory*> attackList = this->toAttack();
+		Territory* defend = defendList[0];
+		for (Territory* t : defendList) {
+			if (t->getArmies() >= defend->getArmies()) {
+				defend = t;
+			}
+		}
+		player->orderList->add(new Deploy(this->player, false, this->player->getArmies(), defend));
+		player->armiesUsed += this->player->getArmies();
+		cout << this->player->getName() << " has aggresively deployed all their armies, " << this->player->getArmies() << ", on " << defend->getTerritoryName() << "." << endl;
+	}
+	else {
+		//After deploying all armies, keep advancing until they can't, using the strongest armies available.
+		//Get the strongest territory.
+		Territory* strongestTerritory = this->player->getTerritoryList()[0];
+		for (Territory* t : this->player->getTerritoryList()) {
+			if (t->getArmies() >= strongestTerritory->getArmies()) {
+				strongestTerritory = t;
+			}
+		}
+		//Find adjacent territories for the strongest territory to attack.
+		vector<Territory*> attackList = this->toAttack();
+		//Attack the first territory it can find, otherwise, it ends its turn.
+		if (attackList.size() > 0) {
+			this->player->orderList->add(new Advance(this->player, false, strongestTerritory->getArmies(), strongestTerritory, attackList[0]));
+		}
+		this->player->issueOrderDone = true;
+	}
 }
 
 /*
 * Benevolent Player
 */
 
-void BenevolentPlayerStrategy::issueOrder() {
+BenevolentPlayerStrategy::BenevolentPlayerStrategy(Player* player) {
+	this->player = player;
+}
 
+void BenevolentPlayerStrategy::issueOrder() {
+	//Get a list of all the territories with the least amount of armies deployed to it.
+	vector<Territory*> defend = this->toDefend();
+	//Go about equally distributing remaining armies to weakest territories until there are none.
+	int armiesEqualDistribute = this->player->getArmies() / defend.size();
+	if (armiesEqualDistribute <= 0) {
+		armiesEqualDistribute = 1;
+	}
+	//Issue deploy orders to as many of the player's weakest territories as possible.
+	for (Territory* territory : defend) {
+		player->orderList->add(new Deploy(this->player, false, armiesEqualDistribute, territory));
+		cout << this->player->getName() << " has benevolently deployed " << armiesEqualDistribute << ", armies to defend " <<territory->getTerritoryName() << "." << endl;
+		player->armiesUsed += armiesEqualDistribute;
+		if (this->player->armiesUsed >= this->player->getArmies()) {
+			break;
+		}
+	}
+	this->player->issueOrderDone = true;
 }
 
 vector<Territory*> BenevolentPlayerStrategy::toDefend() {
-
-    return this->territories;
+	vector<Territory*> defend;
+    //Find the smallest amount of armies deployed to a territory.
+	int smallest = this->player->getTerritoryList()[0]->getArmies();
+	for (Territory* territory : this->player->getTerritoryList()) {
+		if (territory->getArmies() < smallest) {
+			smallest = territory->getArmies();
+		}
+	}
+	//Now create a list of all the territories with the smallest amount of armies deployed.
+	for (Territory* territory : this->player->getTerritoryList()) {
+		if (territory->getArmies() == smallest) {
+			defend.push_back(territory);
+		}
+	}
+	return defend;
 }
 
 vector<Territory*> BenevolentPlayerStrategy::toAttack() {
-
+	//Benevolent player does not attack, therefore, it will return its own territories.
     return this->territories;
 }
 
@@ -230,39 +338,48 @@ vector<Territory*> BenevolentPlayerStrategy::toAttack() {
  * Neutral Player
  */
 
-NeutralPlayerStrategy::NeutralPlayerStrategy() = default;
+NeutralPlayerStrategy::NeutralPlayerStrategy(Player* player) {
+	this->player = player;
+}
 
 void NeutralPlayerStrategy::issueOrder() {
     cout<< "Neutral Player No Order"<<endl;
+	this->player->issueOrderDone = true;
 }
 
 void NeutralPlayerStrategy::changeStrategy()  {
+	//If a neutral player is attack, change its strategy to aggressive.
     if(this->getPlayer()->beingAttacked())
     {
-        this->getPlayer()->setPlayerStrategy(this);
+        this->getPlayer()->setPlayerStrategy(new AggressivePlayerStrategy(this->player));
     }
 }
 
 vector<Territory*> NeutralPlayerStrategy::toDefend() {
-
+	//A neutralplayer never issues an order.
     return this->territories;
 }
 
 vector<Territory*> NeutralPlayerStrategy::toAttack() {
-
+	//A neutral player never issues an order.
     return this->territories;
 }
 
 /*
  * Cheater Player
  */
+CheaterPlayerStrategy::CheaterPlayerStrategy(Player* player) {
+	this->player = player;
+}
+
 void CheaterPlayerStrategy::issueOrder() {
-    cout<< "Cheater Player No Order"<<endl;
+	//The cheater will only steal territories from other players.
+	this->toAttack();
 }
 
 //Cheater player doesn't defend
 vector<Territory*> CheaterPlayerStrategy::toDefend() {
-   
+   //A cheater player cheats and bever defends its territories.
     return this->territories;
 }
 
@@ -270,32 +387,39 @@ vector<Territory*> CheaterPlayerStrategy::toDefend() {
  * Cheater automatically conquers all territories that are adjacent from conquered territories
  */
 vector<Territory*> CheaterPlayerStrategy::toAttack() {
-
-    vector<Territory*> all_territories = this->getPlayer()->getTerritoryList();
-
-    vector<Territory*> conquered_territories;
-    for(int i=0; i<all_territories.size(); i++)
-    {
-        if (all_territories[i]->getPlayer()->getName() == this->getPlayer()->getName())
-        {
-            conquered_territories.push_back(all_territories[i]);
-        }
-    }
-    for(int i=0; i<conquered_territories.size(); i++)
-    {
-        int row = conquered_territories[i]->getTerritoryID();
-        for(int j=0; j<this->getPlayer()->getMap()->getMatrix().size(); j++)
-        {
-            if(this->getPlayer()->getMap()->getMatrix()[row][j].getGraphWeight() == 1)
-            {
-                if(this->getPlayer()->getMap()->getMatrix()[row][j].getPlayer()->getName() != this->getPlayer()->getName())
-                {
-                    this->getPlayer()->getMap()->getMatrix()[row][j].setPlayer(this->getPlayer());
-                }
-            }
-        }
-    }
-    return all_territories;
+	vector<Territory*> cheatedTerritories;
+	for (Territory* conquered : this->player->getTerritoryList()) {
+		int row = conquered->getTerritoryID() - 1;
+		for (int j = 0; j < this->getPlayer()->getMap()->getMatrix()[row].size(); j++) {
+			if (this->getPlayer()->getMap()->getMatrix()[row][j].getGraphWeight() == 1) {
+				string territoryName = this->getPlayer()->getMap()->getMatrix()[row][j].getTerritoryName();
+				bool ownsTerritory = false;
+				for (Territory* t : this->getPlayer()->getTerritoryList()) {
+					if (territoryName == t->getTerritoryName()) {
+						ownsTerritory = true;
+						break;
+					}
+				}
+				if (!ownsTerritory) {
+					bool alreadyDisplayed = false;
+					Territory* t = this->player->getTerritoryByName(this->player->THE_GAME_MAP->countries, territoryName);
+					for (Territory* displayed : cheatedTerritories) {
+						if (territoryName == displayed->getTerritoryName()) {
+							alreadyDisplayed = true;
+							break;
+						}
+					}
+					if (!alreadyDisplayed) {
+						cheatedTerritories.push_back(t);
+						this->player->getTerritoryList().push_back(t);
+						cout << "The cheater " << this->player->getName() << " stole: " << territoryName << endl;
+					}
+				}
+			}
+		}
+	}
+	this->player->issueOrderDone = true;
+	return cheatedTerritories;
 }
 
 

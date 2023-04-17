@@ -137,7 +137,7 @@ void Deploy::execute()
         cout << this->effect << endl;
         territory->setArmies(army_deploy + territory->getArmies());
         getOwner()->addArmies((army_deploy * -1));
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+         std::this_thread::sleep_for(std::chrono::seconds(1));
         cout << "Army deployed!" << endl;
     }
     else
