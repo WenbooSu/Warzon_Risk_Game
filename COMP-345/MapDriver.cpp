@@ -15,7 +15,7 @@ int mapDriver() {
     // brasil.map is Connected
     // brasil2.map is NOT Connected
     // terribleMap.map is NOT valid
-    string fileName="map.txt";
+    /*string fileName="map.txt";
     MapLoader maploader(fileName);
 
     maploader.verifyMapFile();
@@ -48,6 +48,6 @@ int mapDriver() {
     cout<<map.continentsValidate()<<endl<<endl;
 
     cout<<endl<<"Verify Each Territory only Belongs to 1 Continent: "<<endl<<endl;
-    map.check4Continents(v2,v1);
+    map.check4Continents(v2,v1);*/
     return 0;
 }

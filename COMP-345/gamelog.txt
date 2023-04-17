@@ -1,0 +1,358 @@
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of TWO
+An order been added to orderList of ONE
+State has transitioned to endissueorders
+TWO has been has played their order with the following effect: Deploying army on player territory Parana...
+ONE has been has played their order with the following effect: Deploying army on player territory Acre...
+State has transitioned to endexecorders
+State has transitioned to issueorder
+An order been added to orderList of TWO
+An order been added to orderList of ONE
+State has transitioned to endissueorders
+TWO has been has played their order with the following effect: Deploying army on player territory Sergipe...
+ONE has been has played their order with the following effect: Deploying army on player territory Alagoas...
+State has transitioned to endexecorders
+State has transitioned to issueorder
+An order been added to orderList of TWO
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of TOO
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of TOO
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of TOO
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to endissueorders
+TOO has been has played their order with the following effect: Deploying army on player territory Sergipe...
+ONE has been has played their order with the following effect: Deploying army on player territory Acre...
+State has transitioned to endexecorders
+State has transitioned to issueorder
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of TOO
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of ONE
+State has transitioned to endissueorders
+ONE has been has played their order with the following effect: Deploying army on player territory Tocantins...
+ONE has been has played their order with the following effect: Your armies fought hard but the territory was not conquered.
+State has transitioned to endexecorders
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of ONE
+State has transitioned to endissueorders
+ONE has been has played their order with the following effect: Deploying army on player territory Tocantins...
+ONE has been has played their order with the following effect: Your armies fought hard but the territory was not conquered.
+State has transitioned to endexecorders
+State has transitioned to issueorder
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of ONE
+State has transitioned to endissueorders
+ONE has been has played their order with the following effect: Deploying army on player territory Tocantins...
+ONE has been has played their order with the following effect: Your armies fought hard but the territory was not conquered.
+State has transitioned to endexecorders
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of ONE
+State has transitioned to endissueorders
+ONE has been has played their order with the following effect: Deploying army on player territory Tocantins...
+ONE has been has played their order with the following effect: Congratulations, the territory Tocantinsnow belongs to you!
+State has transitioned to endexecorders
+State has transitioned to issueorder
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of TOO
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of ONE
+An order been added to orderList of TOO
+State has transitioned to loadmap
+State has transitioned to loadmap
+State has transitioned to validatemap
+State has transitioned to addplayer
+State has transitioned to addplayer
+State has transitioned to gamestart
+State has transitioned to issueorder
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+An order been added to orderList of TOO
+An order been added to orderList of ONE
+State has transitioned to endissueorders
+TOO has been has played their order with the following effect: Deploying army on player territory Bahia...
+ONE has been has played their order with the following effect: Deploying army on player territory Tocantins...
+TOO has been has played their order with the following effect: Your armies fought hard but the territory was not conquered.
+ONE has been has played their order with the following effect: Your armies fought hard but the territory was not conquered.
+State has transitioned to endexecorders
+State has transitioned to issueorder
+An order been added to orderList of TOO

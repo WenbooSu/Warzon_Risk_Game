@@ -60,13 +60,13 @@ private:
     //int vertices;
     string fileName;
     vector<vector<Territory>> matrix;
-    vector<vector<Territory>> generateGraph(vector<Territory> countries, string fileName);
+    vector<vector<Territory>> generateGraph(vector<Territory*> countries, string fileName);
     void DFS(int v, vector<bool> &visited, int size);
     void DFS4Continents(int v, vector<bool> &visited, int size, vector<vector<Continents>> cv2d);
 
 public:
     Map();
-    Map(vector<Territory> countries, string fileName);
+    Map(vector<Territory*> countries, string fileName);
     Map(int numOfNodes);
     ~Map();
     void addEdge(int n, int m);
@@ -75,12 +75,13 @@ public:
     bool continentsValidate();
     void check4Continents(vector<Territory> vt, vector<Continents> vc);
     vector<vector<Territory>> getMatrix();
+    vector<Territory*> countries;
 };
 
 class MapLoader
 {
 private:
-    Map map;
+    Map* map;
     string fileName;
     int getLineCount(string fileName, string a, string b);
 
@@ -90,9 +91,8 @@ public:
     ~MapLoader();
     //int getLineCount(string fileName, string a, string b);
     vector<Continents> getContinentsFromMapFile();
-    vector<Territory> getCountriesFromMapFile();
+    vector<Territory*> getCountriesFromMapFile();
     bool bonusContinent(Continents, vector<Territory*>);
-    vector<Territory*> countries;
     void assignArmies(vector<Continents> cv, vector<Territory> tv);
     void showMap();
     bool verifyMapFile();

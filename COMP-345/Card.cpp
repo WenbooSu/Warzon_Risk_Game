@@ -51,10 +51,10 @@ void playerHand::showHand(){
     }
 }
 //displays the card being played returning the card before erasing it from players hand
-Card playerHand::play(int handPos,Deck &d1){
+Card playerHand::play(int handPos,Deck* d1){
     std::cout<< "playing the card " << hand[handPos].CardType <<"\n";
     Card card = hand[handPos];
-    d1.returnCard(hand[handPos]);
+    d1->returnCard(hand[handPos]);
     hand.erase(hand.begin()+handPos);
     return card;
 }

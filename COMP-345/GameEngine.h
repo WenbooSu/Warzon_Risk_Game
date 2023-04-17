@@ -6,6 +6,7 @@
 #include "Card.h"
 #include "CommandProcessing.h"
 #include "LoggingObserver.h"
+#include "PlayerStrategy.h"
 
 using namespace std;
 
@@ -172,7 +173,7 @@ private:
 	bool isPlaying;
 	State* currentState;
 	string userCommand;
-	MapLoader* map;
+	MapLoader* mapLoader;
 	vector<Player*> players;
 	Deck* deck;
 	CommandProcessor* commandProcessor;

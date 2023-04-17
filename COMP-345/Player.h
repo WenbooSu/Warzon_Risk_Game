@@ -19,6 +19,8 @@ public:
     PlayerStrategy* ps; //NEW
     Map* THE_GAME_MAP; //NEW
     vector<int> armies_record; //NEW, to determine being attacked or not
+    vector<Player*> players;
+    Deck* deck;
 
     Player();
     Player(string, vector<Territory*>, playerHand*, OrdersList*);
@@ -27,8 +29,8 @@ public:
     ~Player();
 
     vector<Territory*> toDefend();
-    vector<Territory*> toAttack(vector<Territory*>);
-    void issueOrder(Deck*, vector<Player*>, MapLoader*);
+    vector<Territory*> toAttack();
+    void issueOrder(Deck*, vector<Player*>, Map*);
 
     string getName();
     vector<Territory*> getTerritoryList();
@@ -45,6 +47,7 @@ public:
     vector<Territory*> compareTerritoryList(vector<Territory*>, vector<Territory*>);
     int getArmies();
     void addArmies(int);
+    Territory* getTerritoryByName(vector<Territory*>, string);
 
     void setPlayerStrategy(PlayerStrategy* psp);
     Map* getMap();
@@ -55,7 +58,6 @@ private:
     vector<Territory*> territoryList;
     vector<Player*> noAttackList;
     int armies;
-    Territory* getTerritoryByName(vector<Territory*>, string);
 };
 
 ostream& operator<<(ostream& os, Player player);

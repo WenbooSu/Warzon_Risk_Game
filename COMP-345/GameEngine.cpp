@@ -316,7 +316,7 @@ State* StateWin::Transition(string command) {
 *******************************/
 GameEngine::GameEngine() {
 	this->currentState = new StateStart();
-	this->map = nullptr;
+	this->mapLoader = nullptr;
 	this->deck = new Deck();
 	this->commandProcessor = new CommandProcessor();
 	this->isPlaying = true;
@@ -324,7 +324,7 @@ GameEngine::GameEngine() {
 
 GameEngine::GameEngine(GameEngine& engine) {
 	this->currentState = engine.currentState;
-	this->map = nullptr;
+	this->mapLoader = nullptr;
 	this->deck = new Deck();
 	this->commandProcessor = engine.commandProcessor;
 	this->isPlaying = true;
@@ -332,7 +332,7 @@ GameEngine::GameEngine(GameEngine& engine) {
 
 GameEngine::~GameEngine() {
 	delete this->currentState;
-	delete this->map;
+	delete this->mapLoader;
 	//Go through each play in the instance's player vector and delete them.
 	for (Player* p : this->players) {
 		delete p;
@@ -384,9 +384,8 @@ void GameEngine::startupPhase() {
 	int numPlayers = 0;
 	//Loop until the startup phase has been completed.
 	while (dynamic_cast<StateAssign*>(this->currentState) == nullptr) {
-		cout << "\n\nState: " << this->currentState->getName() << endl;
+		cout << "\nState: " << this->currentState->getName() << endl;
 		//Get the user's command and input.
-		//getline(cin, input);
 		input = this->commandProcessor->getCommand().getCommandName();
 		//Split the string: first is the command, second is any input such as map name or player name.
 		commands = this->commandProcessor->commandSplit();
@@ -395,11 +394,11 @@ void GameEngine::startupPhase() {
 		this->changeState(commands[0]);
 		//Based on changed state changed to, do correspoinding part of the startup phase.
 		if (StateMapLoad* s = dynamic_cast<StateMapLoad*>(this->currentState); s != nullptr && validCommand) {
-			this->map = s->LoadMap(commands[1]);
+			this->mapLoader = s->LoadMap(commands[1]);
 			//If the map does not exist in the directory, do not allow user to proceed to validate map state.
-			validMap = this->map == nullptr ? false : true;
+			validMap = this->mapLoader == nullptr ? false : true;
 			if (validMap) {
-				this->map->showMap();
+				this->mapLoader->showMap();
 			}
 			else {
 				cout << "Map file not found. Please enter an existing map before validation." << endl;
@@ -407,7 +406,7 @@ void GameEngine::startupPhase() {
 		}
 		if (StateMapValidate* s = dynamic_cast<StateMapValidate*>(this->currentState); s != nullptr && validCommand && validMap) {
 			//If the map is invalid, stay in the map load state.
-			if (!this->map->verifyMapFile()) {
+			if (!this->mapLoader->verifyMapFile()) {
 				this->currentState = new StateMapLoad();
 			}
 		}
@@ -422,7 +421,8 @@ void GameEngine::startupPhase() {
 				numPlayers++;
 				Player* player = new Player();
 				player->setName(commands[1]);
-				cout << player->getName() << endl;
+				player->THE_GAME_MAP = this->mapLoader->getMap();
+				player->deck = this->deck;
 				this->players.push_back(player);
 			}
 			else {
@@ -435,11 +435,39 @@ void GameEngine::startupPhase() {
 			this->currentState = new StateAddPlayers();
 		}
 	}
+	//Once all the players have been added, decide what type of player they are.
+	for (Player* player : this->players) {
+		cout << "Player: " << player->getName() << endl;
+		cout << "Please choose this player's strategy: " <<
+			"\n1.Human Player\n2.Aggressive Player\n3.Benelovent Player\n4.Neutral Player\n5.Cheater Player\n";
+		int playerStrategyChoice;
+		cin >> playerStrategyChoice;
+		switch (playerStrategyChoice) {
+		case 1:
+			player->ps = new HumanPlayerStrategy(player);
+			break;
+		case 2:
+			player->ps = new AggressivePlayerStrategy();
+			break;
+		case 3:
+			player->ps = new BenevolentPlayerStrategy();
+			break;
+		case 4:
+			player->ps = new NeutralPlayerStrategy();
+			break;
+		case 5:
+			player->ps = new CheaterPlayerStrategy();
+			break;
+		default:
+			player->ps = new HumanPlayerStrategy(player);
+		}
+		cout << endl;
+	}
 	//At the end of the startup phase, after adding players, start by setting up the deck of cards.
 	const int numCards = 2 * numPlayers;
 	this->deck->createDeck(numCards);
 	//Begin by distributing the territories to players.
-	vector<Territory*> territories = this->map->countries;
+	vector<Territory*> territories = this->mapLoader->getMap()->countries;
 	int numTerritoriesPerPlayer = territories.size() / numPlayers;
 	Player* player = this->players[0];
 	int j = 0;
@@ -506,9 +534,9 @@ void GameEngine::reinforcementPhase() {
 			basicReinforcement = 3;
 		}
 		//Go through each continent, and verify whether they earn bonus for controlling all its territories.
-		vector<Continents> continents = this->map->getContinentsFromMapFile();
+		vector<Continents> continents = this->mapLoader->getContinentsFromMapFile();
 		for (Continents continent : continents) {
-			if (this->map->bonusContinent(continent, player->getTerritoryList())) {
+			if (this->mapLoader->bonusContinent(continent, player->getTerritoryList())) {
 				//Add bonuc based on constant value.
 				controlBonus += 2;
 			}
@@ -534,7 +562,7 @@ void GameEngine::issueOrdersPhase() {
 			cout << "\nPlayer: " << player->getName() << ", conitnue issuing orders? Type " << endDecision << " to stop: " << endl;
 			cin >> decision;
 			if (decision != endDecision) {
-				player->issueOrder(this->deck, this->players, this->map);
+				player->issueOrder(this->deck, this->players, this->mapLoader->getMap());
 			}
 			else {
 				//If that player no longer has orders to execute, count them as done.

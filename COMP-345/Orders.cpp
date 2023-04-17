@@ -234,8 +234,12 @@ void Advance::execute()
 
             if (source_territory->getArmies() == 0)
             {
-                this->effect = "Congratulations, the territory " + source_territory->getTerritoryName() + "now belongs to you!";
+                this->effect = "Congratulations, the territory " + source_territory->getTerritoryName() + " now belongs to you!";
                 source_territory->setArmies(army_deploy);
+                //Add the territory to the playr who advanced to it.
+                this->getOwner()->getTerritoryList().push_back(source_territory);
+                //Remove the territory from the previous player who owned it.
+                Player* previous = source_territory->getPlayer();
                 cout << this->effect << endl;
             }
             else {
