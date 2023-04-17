@@ -177,12 +177,17 @@ private:
 	vector<Player*> players;
 	Deck* deck;
 	CommandProcessor* commandProcessor;
+
+	Tournament* tournament;
+
 	//The first phase which we give armies depending on the player controlled territory
 	void reinforcementPhase();
 	//The second phase in which the players issue orders
 	void issueOrdersPhase();
 	//The last phase where the orders are executed and ending the players turn
 	void executeOrdersPhase();
+	//Tournament phase execution
+	void executeTournament(Tournament* t);
 	string stringToLog(const string&);
 
 public:
@@ -208,4 +213,24 @@ public:
 	friend ostream& operator << (ostream&, const GameEngine&);
 	/*Take input as a command.*/
 	friend istream& operator >> (istream&, GameEngine&);
+};
+
+class Tournament : public Subject
+{
+public:
+	Tournament(vector<string>  mapArray, vector<string> playerStrategies, int numOfGames, int maxNumOfTurns);
+	Tournament(const Tournament& tournament);
+	Tournament& operator =(const Tournament& tournament);
+	~Tournament();
+
+	friend ostream& operator << (ostream& out, const Tournament& t);
+
+private:
+	friend class GameEngine;
+	vector<string>  mapArray;
+	vector<Map*> maps;
+	vector<string> playerStrategies;
+	int numOfGames;
+	int maxNumOfTurns;
+	vector<string> resultArray;
 };
