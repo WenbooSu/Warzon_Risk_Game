@@ -607,7 +607,7 @@ void GameEngine::executeTournament(Tournament* t)
 			CommandProcessor* cmdProcessor = gameEngine->getCommandProcessor();
 
 			//Load and validate a map
-			cmdProcessor->
+			//cmdProcessor->
 		}
 	}
 }
