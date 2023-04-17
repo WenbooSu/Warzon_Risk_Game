@@ -141,25 +141,30 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Card.h" />
+    <ClInclude Include="CommandProcessing.h" />
     <ClInclude Include="GameEngine.h" />
+    <ClInclude Include="LoggingObserver.h" />
     <ClInclude Include="MapLoader.h" />
     <ClInclude Include="Orders.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="State.h" />
+    <ClInclude Include="PlayerStrategy.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="CardDriver.cpp" />
+    <ClCompile Include="CommandProcessing.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameEngineDriver.cpp" />
+    <ClCompile Include="LoggingObserver.cpp" />
+    <ClCompile Include="MaineGameLoopDriver.cpp" />
     <ClCompile Include="MapDriver.cpp" />
     <ClCompile Include="MapLoader.cpp" />
     <ClCompile Include="Orders.cpp" />
     <ClCompile Include="OrdersDriver.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerDriver.cpp" />
+    <ClCompile Include="PlayerStrategy.cpp" />
     <ClCompile Include="StartupPhaseDriver.cpp" />
-    <ClCompile Include="State.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

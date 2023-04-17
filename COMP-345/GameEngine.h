@@ -1,8 +1,12 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <sstream>
 #include "MapLoader.h"
 #include "Card.h"
+#include "CommandProcessing.h"
+#include "LoggingObserver.h"
+#include "PlayerStrategy.h"
 
 using namespace std;
 
@@ -11,12 +15,15 @@ using namespace std;
 * Description: This is an abstract class that every state 
 *              will inherit from.
 */
-class State {
+class State : public Subject, public ILoggable{
 protected:
 	const string* name;
 	/*Default error message output.*/
 	State* invalidCommmand();
+	string stringToLog(const string&);
 public:
+	State();
+	~State();
 	/*Return the name of the state.*/
 	string getName();
 	/*Transition to state based on user input.*/
@@ -161,29 +168,40 @@ public:
 * Base class
 * Description: This class controls and manages the game states.
 */
-class GameEngine {
+class GameEngine : public Subject, public ILoggable {
 private:
-	const string* const commandEnd = new string("end");
+	bool isPlaying;
 	State* currentState;
 	string userCommand;
-	MapLoader* map;
+	MapLoader* mapLoader;
 	vector<Player*> players;
 	Deck* deck;
-	void CommandSplit(string, string values[], int);
+	CommandProcessor* commandProcessor;
+	//The first phase which we give armies depending on the player controlled territory
+	void reinforcementPhase();
+	//The second phase in which the players issue orders
+	void issueOrdersPhase();
+	//The last phase where the orders are executed and ending the players turn
+	void executeOrdersPhase();
+	string stringToLog(const string&);
 
 public:
 	GameEngine();
 	~GameEngine();
 	/*Copy Constructor*/
 	GameEngine(GameEngine& engine);
-	/*Check if the game should continue based on user inputand state.*/
-	bool isPlaying();
+	/*Check if the game should continue based on user input and state.*/
+	bool getIsPlaying();
 	/*Return the name of the current state*/
 	string getStateName();
 	/*Given user input, change or deny the state transition.*/
-	bool ChangeState(string command);
+	bool changeState(string command);
 	/*Call the startup method of the current state to commence it part of the startup phase.*/
-	void StartupPhase();
+	void startupPhase();
+	/*Main game loop of the Warzone game, following the startup phase and turn order decided there.*/
+	void mainGameLoop();
+	/*If the game is complete, decide whether to start another game.*/
+	void endPhase();
 	/*Compare name of this current state and parameter's.*/
 	bool operator == (GameEngine* engine);
 	/*Print the engine's current state.*/

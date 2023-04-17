@@ -10,19 +10,20 @@
 #include <thread>
 #include <algorithm>
 
-using namespace std;
-
 //--Orders--
 Order::Order() : owner(nullptr), if_executed(false)
 {
+    this->addObserver(this);
 }
 
 Order::Order(Player* theOwner, bool if_executed) : owner(theOwner), if_executed(false)
 {
+    this->addObserver(this);
 }
 
 Order::~Order()
 {
+    this->removeObserver(this);
 }
 
 Order::Order(const Order& o)
@@ -43,13 +44,19 @@ ostream& operator<<(std::ostream& out, const Order& o)
     return out << "Performing an operation by " << o.owner->getName() << endl;
 }
 
+std::string Order::stringToLog(const std::string& output) {
+    return this->getOwner()->getName() + " has been has played their order with the following effect: " + this->effect;
+}
+
 //--OrdersList--
 OrdersList::OrdersList()
 {
+    this->addObserver(this);
 }
 
 OrdersList::~OrdersList()
 {
+    this->removeObserver(this);
 }
 
 OrdersList::OrdersList(const OrdersList& theOrdersList)
@@ -67,6 +74,7 @@ vector<Order*> OrdersList::getList()
 
 void  OrdersList::add(Order* ord)
 {
+    this->notify(this->stringToLog(ord->getOwner()->getName()));
     list.push_back(ord);
 }
 
@@ -91,6 +99,10 @@ void OrdersList::remove(int pos)
 void OrdersList::display()
 {
     cout << "Orderlist has " << list.size() << " objects." << endl;
+}
+
+std::string OrdersList::stringToLog(const std::string& name) {
+    return "An order been added to orderList of " + name;
 }
 
 //--Deploy--
@@ -121,7 +133,8 @@ void Deploy::execute()
 {
     if (validate())
     {
-        cout << "Deploying army on player territory.." << endl;
+        this->effect = "Deploying army on player territory " + territory->getTerritoryName() + "...";
+        cout << this->effect << endl;
         territory->setArmies(army_deploy + territory->getArmies());
         getOwner()->addArmies((army_deploy * -1));
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -129,8 +142,10 @@ void Deploy::execute()
     }
     else
     {
-        cout << "Invalid order: Cannot deploy on this territory" << endl;
+        this->effect = "Invalid order: Cannot deploy on this territory";
+        cout << this->effect << endl;
     }
+    this->notify(this->stringToLog(this->effect));
 }
 
 //Stream insertion operator
@@ -163,7 +178,7 @@ bool Advance::validate()
     vector<Territory*> checkList = getOwner()->getTerritoryList();
     //vector<Territory*> checkList = getOwner()->getTerritoryList();
 
-    if (find(checkList.begin(), checkList.end(), source_territory) != checkList.end())
+    if (find(checkList.begin(), checkList.end(), source_territory) == checkList.end())
         return false;
     //Adjacency
 
@@ -173,7 +188,6 @@ bool Advance::validate()
 void Advance::execute()
 {
     vector<Territory*> checkList = getOwner()->getTerritoryList();
-
     if (validate())
     {
         cout << "Advancing army..." << endl;
@@ -181,9 +195,26 @@ void Advance::execute()
 
         if (find(checkList.begin(), checkList.end(), adjacent_territory) != checkList.end())
         {            
-            adjacent_territory->setArmies(adjacent_territory->getArmies() + army_deploy);
-            source_territory->setArmies(source_territory->getArmies() - army_deploy);
-            cout << "Your army has advanced to friendly territory!" << endl;
+            //Check for the remaining number of armies commanded to deploy from source territory.
+            if (source_territory->getArmies() >= this->army_deploy) {
+                //If the source has enough, move them to the target
+                adjacent_territory->setArmies(adjacent_territory->getArmies() + army_deploy);
+                source_territory->setArmies(source_territory->getArmies() - army_deploy);
+                this->effect = "Your army has advanced to friendly territory!";
+                cout << this->effect << endl;
+            }
+            else if (source_territory->getArmies() <= 0) {
+                //If the source has no armies, move nothing.
+                this->effect = "No more remaining armies to be moved!";
+                cout << this->effect << endl;
+            }
+            else {
+                //If more armies are commanded than what the source contains, move remaining armies from source.
+                adjacent_territory->setArmies(adjacent_territory->getArmies() + source_territory->getArmies());
+                source_territory->setArmies(source_territory->getArmies() - source_territory->getArmies());
+                this->effect = "Your army has advanced to friendly territory!";
+                cout << this->effect << endl;
+            }
         }
         else
         {
@@ -203,15 +234,26 @@ void Advance::execute()
 
             if (source_territory->getArmies() == 0)
             {
+                this->effect = "Congratulations, the territory " + source_territory->getTerritoryName() + " now belongs to you!";
                 source_territory->setArmies(army_deploy);
-                cout << "Congratulations, this territory now belongs to you!" << endl;
+                //Add the territory to the playr who advanced to it.
+                this->getOwner()->getTerritoryList().push_back(source_territory);
+                //Remove the territory from the previous player who owned it.
+                Player* previous = source_territory->getPlayer();
+                cout << this->effect << endl;
+            }
+            else {
+                this->effect = "Your armies fought hard but the territory was not conquered.";
+                cout << this->effect << endl;
             }
         }
     }
     else
     {
-        cout << "Invalid order: Cannot advance on this enemy territory since it is neutral" << endl;
+        this->effect = "Invalid order: Cannot advance on this enemy territory since it is neutral";
+        cout << this->effect << endl;
     }
+    this->notify(this->stringToLog(this->effect));
 }
 
 //--Bomb--
@@ -251,12 +293,15 @@ void Bomb::execute()
         cout << "Bombing in progress" << endl;
         target_territory->setArmies(target_territory->getArmies() / 2);
         std::this_thread::sleep_for(std::chrono::seconds(2)); //sleep for 2s
-        cout << "Your opponent has lost half their army!" << endl;
+        this->effect = "Your opponent has lost half their army!";
+        cout <<this->effect << endl;
     }
     else
     {
-        cout << "Invalid order" << endl;
+        this->effect = "Invalid bomb order";
+        cout << this->effect << endl;
     }
+    this->notify(this->stringToLog(this->effect));
 }
 
 //--Blockade--
@@ -289,12 +334,15 @@ void Blockade::execute()
         cout << "Blockade in progress..." << endl;
         target_territory->setArmies(target_territory->getArmies() * 2);
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        cout << "Blockade Complete!" << endl;
+        this->effect = "Blockade Complete on " + target_territory->getTerritoryName() + "!";
+        cout <<this->effect << endl;
     }
     else
     {
-        cout << "Invalid order: you cannot perform a blockade on this territory" << endl;
+       this->effect = "Invalid order: you cannot perform a blockade on this territory";
+        cout <<this->effect << endl;
     }
+    this->notify(this->stringToLog(this->effect));
 }
 
 //--Airlift--
@@ -319,13 +367,15 @@ Airlift::Airlift(const Airlift& airliftObj) : Order(airliftObj)
 bool Airlift::validate()
 {
     vector<Territory*> checkList = getOwner()->getTerritoryList();
-
-    if (!(find(checkList.begin(), checkList.end(), source_territory) != checkList.end()))
+    if (find(checkList.begin(), checkList.end(), source_territory) == checkList.end()) {
+        cout << "The source territory " << source_territory->getTerritoryName() << " does not belong to you." << endl;
         return false;
+    }
 
-    if (!(find(checkList.begin(), checkList.end(), target_territory) != checkList.end()))
+    if (!(find(checkList.begin(), checkList.end(), target_territory) != checkList.end())) {
+        cout << "The target territory " << target_territory->getTerritoryName() << " does not belong to you." << endl;
         return false;
-
+    }
     return true;
 }
 
@@ -333,16 +383,37 @@ void Airlift::execute()
 {
     if (validate())
     {
+        int territoryArmies = source_territory->getArmies();
         cout << "Airlifting armies into target territory" << endl;
-        target_territory->setArmies(army_deploy + target_territory->getArmies());
-        source_territory->setArmies(source_territory->getArmies() - army_deploy);
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        cout << "Army airlifted onto the territory!" << endl;
+        //Check that the armies deplaoyed is the number of remaining armies on the territory or less.
+        if (this->army_deploy <= territoryArmies) {
+            //If so, airlift the armies from the source to target territory.
+            target_territory->setArmies(army_deploy + target_territory->getArmies());
+            source_territory->setArmies(source_territory->getArmies() - army_deploy);
+            this->effect = "Army airlifted onto the territory!";
+            cout << this->effect << endl;
+        }
+        else if (territoryArmies <= 0) {
+            //If the sourcce has no armies, move nothing.
+            this->effect = source_territory->getTerritoryName() + " has no remaining armies!";
+            cout << this->effect << endl;
+        }
+        else {
+            //If more armies are commanded to airlift than what the source contains,
+            //airlift all remaining armies from the source territory.
+            target_territory->setArmies(territoryArmies + target_territory->getArmies());
+            source_territory->setArmies(source_territory->getArmies() - territoryArmies);
+            this->effect = "Army airlifted onto the territory!";
+            cout << this->effect << endl;
+        }
     }
     else
     {
-        cout << "Invalid order, you cannot airlift into the territry you are own" << endl;
+        this->effect = "Invalid order, you cannot airlift into the territry you are own";
+        cout << this->effect << endl;
     }
+    this->notify(this->stringToLog(effect));
 }
 
 //--Negotiate--
@@ -374,10 +445,12 @@ void Negotiate::execute()
         this->getOwner()->noAttack(enemyPlayer);
         enemyPlayer->noAttack(this->getOwner());
         std::this_thread::sleep_for(std::chrono::seconds(1)); //sleep for a second
-        cout << "Negotiations complete!" << endl;
+        this->effect = "Negotiations complete!";
+        cout << this->effect << endl;
     }
     else
     {
-        cout << "Invalid order, a player cannot negotiate with themselves" << endl;
+        this->effect = "Invalid order, a player cannot negotiate with themselves";
+        cout << this->effect << endl;
     }
 }

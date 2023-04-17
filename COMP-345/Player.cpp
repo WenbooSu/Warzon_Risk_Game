@@ -3,7 +3,7 @@
 #include<iostream>
 #include <algorithm>
 #include "Player.h"
-#include "MapLoader.h"
+#include "PlayerStrategy.h"
 
 using namespace std;
 
@@ -11,18 +11,30 @@ using namespace std;
 Player::Player(){
 	string name;
 	vector<string*> territoryList;
-	vector<string*> hand;
-	OrdersList orderList;
-	this->armies = new int(0);
+	OrdersList o;
+	this->orderList = new OrdersList();
+	this->hand = new playerHand();
+	this->armies = 0;
+	this->deck = nullptr;
 }
 
 
-Player::Player(string name, vector<Territory*> territoryList, playerHand hand, OrdersList ordersList){
+Player::Player(string name, vector<Territory*> territoryList, playerHand* hand, OrdersList* ordersList){
 	this->name = name;
 	this->territoryList = territoryList;
 	this->hand = hand;
 	this->orderList = orderList;
-	this->armies = new int(0);
+	this->armies = 0;
+	this->deck = nullptr;
+}
+
+Player::Player(std::string name, Map* map, playerHand* hand, OrdersList* ordersList) {
+	this->name = name;
+	this->THE_GAME_MAP = map;
+	this->hand = hand;
+	this->orderList = orderList;
+	this->armies = 0;
+	this->deck = nullptr;
 }
 
 //not deep copy
@@ -31,49 +43,35 @@ Player::Player(const Player& p){
 	this->territoryList = p.territoryList;
 	this->hand = p.hand;
 	this->orderList = p.orderList;
-	*this->armies = *p.armies;
+	this->armies = p.armies;
+	this->deck = nullptr;
 }
 
-//PlayerOrder::~PlayerOrder()
-//{
-//	for (auto territory : territoryList)
-//	{
-//		delete territory;
-//	}
-//	for (auto h : hand)
-//	{
-//		delete h;
-//	}
-//	for (auto order : orderList)
-//	{
-//		delete order;
-//	}
-//	orderList.clear();
-//}
-
-void Player::toDefend(vector<string*> territoryA) {
-
-	cout << "List of territory to defend" << '/';
-	cout << this->name;
-	for (int i = 0; i < territoryA.size(); i++) {
-		cout << territoryA[0] << '/';
-	}
-
-}
-
-void Player::toAttack(vector<string*> territoryD) {
-
-	cout << "List of territory to attack" << '/';
-	cout << this->name;
-	for (int i = 0; i < territoryD.size(); i++) {
-		cout << territoryD[0] << '/';
+Player::~Player() {
+	for (Territory* t : this->territoryList) {
+		delete t;
 	}
 }
 
-void Player::issueOrder(string orderParameter) {//placeholder for now it is just the name of the order
-	Order* order = new Order(orderParameter, false);//using placeholder class to avoid complication
-	this->orderList.add(order);
-	this->orderList.display();
+vector<Territory*> Player::toDefend() {
+	return this->ps->toDefend();
+}
+
+vector<Territory*> Player::toAttack() {
+	return this->ps->toAttack();
+}
+
+void Player::issueOrder(Deck* deck, vector<Player*> players, Map* map) {
+	this->ps->issueOrder();
+}
+
+Territory* Player::getTerritoryByName(vector<Territory*> territories, string name) {
+	for (Territory* t : territories) {
+		if (t->getTerritoryName() == name) {
+			return t;
+		}
+	}
+	return nullptr;
 }
 
 string Player::getName() {
@@ -88,19 +86,23 @@ vector<Territory*> Player::getTerritoryList() {
 	return this->territoryList;
 }
 
-void Player::setTerritoryList(vector<Territory*>) {
-
+void Player::setTerritoryList(vector<Territory*> territoryList) {
+	this->territoryList = territoryList;
 }
 
-playerHand Player::getHand() {
+void Player::addTerritory(Territory* territory) {
+	this->territoryList.push_back(territory);
+}
+
+playerHand* Player::getHand() {
 	return this->hand;
 }
 
 void Player::addToHand(Card card) {
-	this->hand.add(card);
+	this->hand->add(card);
 }
 
-OrdersList Player::getOrderList() {
+OrdersList* Player::getOrderList() {
 	return orderList;
 }
 
@@ -109,12 +111,12 @@ void Player::noAttack(Player* ally)
 	this->noAttackList.push_back(ally);
 }
 
-int* Player::getArmies() {
+int Player::getArmies() {
 	return this->armies;
 }
 
 void Player::addArmies(int added) {
-	*this->armies += added;
+	this->armies += added;
 }
 
 ostream& operator<<(ostream& os, Player player){
@@ -123,8 +125,8 @@ ostream& operator<<(ostream& os, Player player){
 	for (int i = 0; i < t.size(); i++) {
 		os << t[i];
 	}
-	OrdersList ot = player.getOrderList();
-	ot.display();
+	OrdersList* ot = player.getOrderList();
+	ot->display();
 	return os;
 }
 
@@ -141,4 +143,25 @@ vector<Territory*> Player::compareTerritoryList(vector<Territory*> fullT1, vecto
 		}
 	}
 	return terriortyD;
+}
+
+void Player::setPlayerStrategy(PlayerStrategy* psp) {
+	this->ps = psp;
+}
+
+Map* ::Player::getMap() {
+	return this->THE_GAME_MAP;
+}
+
+bool Player::beingAttacked() {
+	int current = this->armies_record[this->armies_record.size() - 1];
+	int last = this->armies_record[this->armies_record.size() - 2];
+	if (current < last)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

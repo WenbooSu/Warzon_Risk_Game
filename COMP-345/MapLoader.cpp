@@ -10,11 +10,6 @@
 #include <vector>
 #include "MapLoader.h"
 
-/*Player::Player() {
-
-
-}*/
-
 Continents::Continents() {
     this->continentName="none";
     this->continentArmies=0;
@@ -57,19 +52,18 @@ void Continents::setContinentWeight() {
 Territory::Territory() {
     continentID=-1;
     territoryName="null";
-    player= nullptr;
+    this->player = nullptr;
     armies=0;
     weight=0;
 }
 
-Territory::Territory(const Territory *) {
-
-}
 
 Territory::Territory(std::string continentID, std::string territoryName, int countryID) {
     this->continentID=continentID;
     this->territoryName=territoryName;
     this->territoryID=countryID;
+    this->player = nullptr;
+    this->armies = 0;
     this->weight=0;
 }
 
@@ -114,8 +108,16 @@ void Territory::setArmies(int a) {
     this->armies=a;
 }
 
+void Territory::addArmies(int a) {
+    this->armies += a;
+}
+
 Player* Territory::getPlayer() {
     return this->player;
+}
+
+void Territory::setPlayer(Player* player) {
+    this->player = player;
 }
 
 Map::Map() {
@@ -127,9 +129,10 @@ Map::~Map() {
 }
 
 
-Map::Map(vector<Territory> countries, string fileName) {
-    matrix=this->generateGraph(countries, fileName);
-    this->fileName=fileName;
+Map::Map(vector<Territory*> countries, string fileName) {
+    matrix = this->generateGraph(countries, fileName);
+    this->fileName = fileName;
+    this->countries = countries;
 }
 
 void Map::addEdge(int n, int m) {
@@ -137,8 +140,12 @@ void Map::addEdge(int n, int m) {
     this->matrix[m][n].setGraphWeight();
 }
 
-vector<vector<Territory>>  Map::generateGraph(vector<Territory> countries, string fileName) {
-    vector<vector<Territory>> temp2DVector (countries.size(), countries);
+vector<vector<Territory>>  Map::generateGraph(vector<Territory*> countries, string fileName) {
+    vector<Territory> countriesCopy;
+    for (Territory* territory : countries) {
+        countriesCopy.push_back(*territory);
+    }
+    vector<vector<Territory>> temp2DVector (countriesCopy.size(), countriesCopy);
     ifstream inStream;
     inStream.open(fileName);
     if(!inStream.is_open())
@@ -242,20 +249,10 @@ bool Map::continentsValidate() {
                 if(matrix[i][j].getGraphWeight()==1)
                 {
                     cv2d[atoi((matrix[i][j].getContinentID()).c_str())-1][atoi((matrix[j][i].getContinentID()).c_str())-1].setContinentWeight();
-                    //cv2d[j][i].setContinentWeight();
                 }
             }
         }
-        /*cout<<"error check here"<<endl;
-        for(int i=0; i<cv2d.size(); i++)
-        {
-            for(int j=0; j<cv2d.size(); j++)
-            {
-                cout<<cv2d[i][j].getContinentWeight()<<" ";
-            }
-            cout<<endl;
-        }*/
-    vector<bool> visited (cv2d.size(), false);
+        vector<bool> visited (cv2d.size(), false);
         DFS4Continents(0,visited,cv2d.size(),cv2d);
         for(int i=0; i<cv2d.size(); i++)
         {
@@ -290,6 +287,10 @@ void Map::toString() {
     }
 }
 
+vector<vector<Territory>> Map::getMatrix() {
+    return this->matrix;
+}
+
 MapLoader::MapLoader() {
 
 }
@@ -300,9 +301,9 @@ MapLoader::~MapLoader() {
 
 MapLoader::MapLoader(string fileName) {
     this->fileName = fileName;
-    vector<Territory> countries = this->getCountriesFromMapFile();
-    this->map = Map(countries, fileName); //map creates here
-    this->map.toString();
+    vector<Territory*> countries = this->getCountriesFromMapFile();
+    this->map = new Map(countries, fileName); //map creates here
+    this->map->toString();
 }
 
 vector<Continents> MapLoader::getContinentsFromMapFile() {
@@ -344,9 +345,8 @@ vector<Continents> MapLoader::getContinentsFromMapFile() {
     return continents;
 }
 
-vector<Territory> MapLoader::getCountriesFromMapFile() {
-    cout <<"calling the function"<<endl;
-    vector<Territory> terrorities;
+vector<Territory*> MapLoader::getCountriesFromMapFile() {
+    vector<Territory*> terrorities;
     ifstream inStream;
     inStream.open(fileName);
     if(!inStream.is_open())
@@ -372,7 +372,7 @@ vector<Territory> MapLoader::getCountriesFromMapFile() {
                 ss >> word3;//continent id
                 //cout << "word 2 is"<<word1<<endl;
                 //Continents continent (word1, atoi(word2.c_str()), (count+1));
-                Territory terrority (word3, word2, atoi(word1.c_str()));
+                Territory* terrority = new Territory(word3, word2, atoi(word1.c_str()));
                 //vector<Continents>:: iterator it;
                 terrorities.push_back(terrority);
                 count++;
@@ -388,6 +388,17 @@ vector<Territory> MapLoader::getCountriesFromMapFile() {
     return terrorities;
 }
 
+bool MapLoader::bonusContinent(Continents continent, vector<Territory*> playerTeritories) {
+    bool bonus = true;
+    for (Territory* territory : playerTeritories) {
+        if (std::stoi(territory->getContinentID()) != continent.getContinentID()){
+            bonus = false;
+            break;
+        }
+    }
+    return bonus;
+}
+
 void MapLoader::assignArmies(vector<Continents> cv, vector<Territory> tv) {
     for(int i=0; i<tv.size(); i++)
     {
@@ -399,8 +410,10 @@ void MapLoader::assignArmies(vector<Continents> cv, vector<Territory> tv) {
 }
 
 void MapLoader::showMap() {
-    map.toString();
+    this->map->toString();
 }
+
+
 
 int MapLoader::getLineCount(std::string fileName, std::string a, std::string b) {
     int count=0;
@@ -481,4 +494,8 @@ bool MapLoader::verifyMapFile() {
         cout<< "The Map File is NOT Valid"<<endl;
         return false;
     }
+}
+
+Map* MapLoader::getMap() {
+    return this->map;
 }

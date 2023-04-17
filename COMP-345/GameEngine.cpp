@@ -1,15 +1,22 @@
 #include <iostream>
 #include <conio.h>
 #include <filesystem>
-#include <sstream>
 #include <algorithm>
 #include <random>
 #include "GameEngine.h"
 using namespace std;
 
 /*******************************
-		State Class 
+		State Class
 *******************************/
+State::State(){
+	this->addObserver(this);
+}
+
+State::~State() {
+	this->removeObserver(this);
+}
+
 string State::getName() {
 	return *name;
 }
@@ -19,6 +26,10 @@ State* State::invalidCommmand() {
 	return nullptr;
 }
 
+string State::stringToLog(const string &output) {
+	return "State has transitioned to " + output;
+}
+
 /*******************************
 	State Start Class
 *******************************/
@@ -26,6 +37,7 @@ StateStart::StateStart() {
 	//Upon instantiation, set name and command to transition state.
 	this->name = new string("Start");
 	this->transition = new string("loadmap");
+	this->addObserver(this);
 }
 
 StateStart::~StateStart() {
@@ -33,9 +45,10 @@ StateStart::~StateStart() {
 	delete this->transition;
 }
 
-State* StateStart::Transition(string command){
+State* StateStart::Transition(string command) {
 	//Verify that the command meets the string to transition, otherwise error.
 	if (command.compare(*this->transition) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateMapLoad();
 	}
 	else {
@@ -53,7 +66,7 @@ void StateStart::Startup() {
 *******************************/
 StateMapLoad::StateMapLoad() {
 	//Upon instantiation, set name and command to both transition states.
-	this->name = new string("Map Load");
+	this->name = new string("Map Loaded");
 	this->transitionLoad = new string("loadmap");
 	this->transitionValidate = new string("validatemap");
 }
@@ -65,12 +78,14 @@ StateMapLoad::~StateMapLoad() {
 }
 
 
-State* StateMapLoad::Transition(string command){
+State* StateMapLoad::Transition(string command) {
 	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionLoad) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateMapLoad();
 	}
 	else if (command.compare(*this->transitionValidate) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateMapValidate();
 	}
 	else {
@@ -85,7 +100,7 @@ MapLoader* StateMapLoad::LoadMap(string mapName) {
 	//Look through each file in the directory for a matching name.
 	for (filesystem::directory_entry file : filesystem::directory_iterator(path)) {
 		string fileName = file.path().string();
-		fileName = fileName.substr(1,fileName.size() - 1);
+		fileName = fileName.substr(1, fileName.size() - 1);
 		//If mach found, return the map loader, with the file name.
 		if (fileName.compare("./" + mapName) == 0) {
 			mapLoader = new MapLoader(path + fileName);
@@ -123,9 +138,10 @@ StateMapValidate::~StateMapValidate() {
 	delete this->map;
 }
 
-State* StateMapValidate::Transition(string command){
+State* StateMapValidate::Transition(string command) {
 	//Verify that the command meets the string to transition, otherwise error.
 	if (command.compare(*this->transition) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateAddPlayers();
 	}
 	else {
@@ -153,12 +169,14 @@ StateAddPlayers::~StateAddPlayers() {
 	delete this->transitionPlay;
 }
 
-State* StateAddPlayers::Transition(string command){
+State* StateAddPlayers::Transition(string command) {
 	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionAdd) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateAddPlayers();
 	}
 	else if (command.compare(*this->transitionPlay) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateAssign();
 	}
 	else {
@@ -187,6 +205,7 @@ StateAssign::~StateAssign() {
 State* StateAssign::Transition(string command) {
 	//Verify that the command meets transition string, otherwise error.
 	if (command.compare(*this->transition) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateIssueOrders();
 	}
 	else {
@@ -212,9 +231,11 @@ StateIssueOrders::~StateIssueOrders() {
 State* StateIssueOrders::Transition(string command) {
 	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionIssueOrder) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateIssueOrders();
 	}
 	else if (command.compare(*this->transitionExecuteOrder) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateExecuteOrders();
 	}
 	else {
@@ -243,12 +264,15 @@ StateExecuteOrders::~StateExecuteOrders() {
 State* StateExecuteOrders::Transition(string command) {
 	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionExecuteOrder) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateExecuteOrders();
 	}
 	else if (command.compare(*this->transitionEndOrders) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateAssign();
 	}
 	else if (command.compare(*this->transitionWin) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateWin();
 	}
 	else {
@@ -262,8 +286,8 @@ State* StateExecuteOrders::Transition(string command) {
 StateWin::StateWin() {
 	//Upon instantiation, set name and commands to both transition states.
 	this->name = new string("Win");
-	this->transitionEnd = new string("end");
-	this->transitionRestart = new string("play");
+	this->transitionEnd = new string("quit");
+	this->transitionRestart = new string("replay");
 }
 
 StateWin::~StateWin() {
@@ -275,9 +299,11 @@ StateWin::~StateWin() {
 State* StateWin::Transition(string command) {
 	//Verify that the command meets the string to one of the transitions, otherwise error.
 	if (command.compare(*this->transitionEnd) == 0) {
+		this->notify(this->stringToLog(command));
 		return nullptr;
 	}
 	else if (command.compare(*this->transitionRestart) == 0) {
+		this->notify(this->stringToLog(command));
 		return new StateStart();
 	}
 	else {
@@ -290,42 +316,44 @@ State* StateWin::Transition(string command) {
 *******************************/
 GameEngine::GameEngine() {
 	this->currentState = new StateStart();
-	this->map = nullptr;
+	this->mapLoader = nullptr;
 	this->deck = new Deck();
+	this->commandProcessor = new CommandProcessor();
+	this->isPlaying = true;
 }
 
 GameEngine::GameEngine(GameEngine& engine) {
 	this->currentState = engine.currentState;
-	this->map = nullptr;
+	this->mapLoader = nullptr;
 	this->deck = new Deck();
+	this->commandProcessor = engine.commandProcessor;
+	this->isPlaying = true;
 }
 
 GameEngine::~GameEngine() {
-	delete this->commandEnd;
 	delete this->currentState;
-	delete this->map;
+	delete this->mapLoader;
 	//Go through each play in the instance's player vector and delete them.
 	for (Player* p : this->players) {
 		delete p;
 	}
 	delete this->deck;
+	delete this->commandProcessor;
 }
 
-bool GameEngine::isPlaying() {
-	/*Check if the command matches the end game command, and
-	  whether the current state can be converted to win state, if not, the current state is already win state.*/
-	return this->userCommand.compare(*this->commandEnd) != 0 || dynamic_cast<StateWin*>(currentState) == nullptr;
+bool GameEngine::getIsPlaying() {
+	return this->isPlaying;
 }
 
 string GameEngine::getStateName() {
 	return this->currentState->getName();
 }
 
-bool GameEngine::ChangeState(string command) {
+bool GameEngine::changeState(string command) {
 	//Store the user's input.
 	this->userCommand = command;
 	//Get the next state from the current state based on user input.
-	State * s = this->currentState->Transition(command);
+	State* s = this->currentState->Transition(command);
 	//If a valid State object was returned, delete the curent and replace it with new one.
 	if (s != NULL) {
 		delete this->currentState;
@@ -335,8 +363,20 @@ bool GameEngine::ChangeState(string command) {
 	return false;
 }
 
-void GameEngine::StartupPhase() {
+void GameEngine::startupPhase() {
+	//Delete log file if it currently exists, otherwise, create it.
+	fstream stream;
+	stream.open(this->filePath);
+	if (!stream.is_open()) {
+		stream << "Startup phase." << endl;
+	}
+	else {
+		const char* file = this->filePath.c_str();
+		remove(file);
+	}
+	stream.close();
 	string input = "";
+	vector<string> commands;
 	bool validMap = false;
 	const int numCommands = 2;
 	const int minPlayers = 2;
@@ -344,33 +384,35 @@ void GameEngine::StartupPhase() {
 	int numPlayers = 0;
 	//Loop until the startup phase has been completed.
 	while (dynamic_cast<StateAssign*>(this->currentState) == nullptr) {
-		cout << "\n\nState: " << this->currentState->getName() << endl;
-		cout << "Please enter a command" << endl;
+		cout << "\nState: " << this->currentState->getName() << endl;
 		//Get the user's command and input.
-		getline(cin, input);
+		input = this->commandProcessor->getCommand().getCommandName();
 		//Split the string: first is the command, second is any input such as map name or player name.
-		string commands[numCommands];
-		CommandSplit(input, commands, numCommands);
-		//If possible, change state, and capture the result.
-		bool validCommand = this->ChangeState(commands[0]);
+		commands = this->commandProcessor->commandSplit();
+		//Validate the command and change state if possible.
+		bool validCommand = this->commandProcessor->validate(this->getStateName());
+		this->changeState(commands[0]);
 		//Based on changed state changed to, do correspoinding part of the startup phase.
 		if (StateMapLoad* s = dynamic_cast<StateMapLoad*>(this->currentState); s != nullptr && validCommand) {
-			this->map = s->LoadMap(commands[1]);
+			this->mapLoader = s->LoadMap(commands[1]);
 			//If the map does not exist in the directory, do not allow user to proceed to validate map state.
-			validMap = this->map == nullptr ? false : true;
+			validMap = this->mapLoader == nullptr ? false : true;
 			if (validMap) {
-				this->map->showMap();
+				this->mapLoader->showMap();
+			}
+			else {
+				cout << "Map file not found. Please enter an existing map before validation." << endl;
 			}
 		}
 		if (StateMapValidate* s = dynamic_cast<StateMapValidate*>(this->currentState); s != nullptr && validCommand && validMap) {
 			//If the map is invalid, stay in the map load state.
-			if (!this->map->verifyMapFile()) {
+			if (!this->mapLoader->verifyMapFile()) {
 				this->currentState = new StateMapLoad();
 			}
 		}
-		//If the map in load state is invalid, inform the user and stay in load map state.
-		else if (!validMap) {
-			cout << "Please enter a valid map." << endl;
+		//If the map in load state is invalid, stay in load map state.
+		else if (StateMapValidate* s = dynamic_cast<StateMapValidate*>(this->currentState); s != nullptr && validCommand && !validMap) {
+			cout << "Map does not exist, please enter an existing map before validating it." << endl;
 			this->currentState = new StateMapLoad();
 		}
 		if (dynamic_cast<StateAddPlayers*>(this->currentState) != nullptr && validCommand) {
@@ -379,7 +421,8 @@ void GameEngine::StartupPhase() {
 				numPlayers++;
 				Player* player = new Player();
 				player->setName(commands[1]);
-				cout << player->getName() << endl;
+				player->THE_GAME_MAP = this->mapLoader->getMap();
+				player->deck = this->deck;
 				this->players.push_back(player);
 			}
 			else {
@@ -392,21 +435,52 @@ void GameEngine::StartupPhase() {
 			this->currentState = new StateAddPlayers();
 		}
 	}
+	//Once all the players have been added, decide what type of player they are.
+	for (Player* player : this->players) {
+		cout << "Player: " << player->getName() << endl;
+		cout << "Please choose this player's strategy: " <<
+			"\n1.Human Player\n2.Aggressive Player\n3.Benelovent Player\n4.Neutral Player\n5.Cheater Player\n";
+		int playerStrategyChoice;
+		cin >> playerStrategyChoice;
+		switch (playerStrategyChoice) {
+		case 1:
+			player->ps = new HumanPlayerStrategy(player);
+			break;
+		case 2:
+			player->ps = new AggressivePlayerStrategy();
+			break;
+		case 3:
+			player->ps = new BenevolentPlayerStrategy();
+			break;
+		case 4:
+			player->ps = new NeutralPlayerStrategy();
+			break;
+		case 5:
+			player->ps = new CheaterPlayerStrategy();
+			break;
+		default:
+			player->ps = new HumanPlayerStrategy(player);
+		}
+		cout << endl;
+	}
 	//At the end of the startup phase, after adding players, start by setting up the deck of cards.
 	const int numCards = 2 * numPlayers;
 	this->deck->createDeck(numCards);
 	//Begin by distributing the territories to players.
-	vector<Territory> territories = this->map->getCountriesFromMapFile();
+	vector<Territory*> territories = this->mapLoader->getMap()->countries;
 	int numTerritoriesPerPlayer = territories.size() / numPlayers;
-	vector<Territory*> territoryList = vector<Territory*>();
 	Player* player = this->players[0];
 	int j = 0;
 	for (int i = 0; i < (numTerritoriesPerPlayer * numPlayers); i++) {
 		if (i % numTerritoriesPerPlayer == 0 && i != 0) {
 			player = this->players[++j];
 		}
-		territoryList.push_back(&territories[i]);
-		cout << "Player: " + player->getName() << "\tAdded: " + territories[i].getTerritoryName() << endl;
+		//Add the territory to the player's list of territories.
+		Territory* t = territories[i];
+		player->addTerritory(t);
+		//Assign the player pointer to the territory.
+		t->setPlayer(player);
+		cout << "Player: " + player->getName() << "\tAdded: " + t->getTerritoryName() << endl;
 	}
 	player = nullptr;
 	//Determine random play order.
@@ -418,13 +492,125 @@ void GameEngine::StartupPhase() {
 		cout << "Player: " + player->getName() << endl;
 		//Give each player 50 armies initially to their reinforcement pool.
 		player->addArmies(armiesStart);
-		cout << "Added initial " << *player->getArmies() << " armies to player" << endl;
+		cout << "Added initial " << player->getArmies() << " armies to player" << endl;
 		//Let each playe draw 2 cards from the deck.
 		player->addToHand(this->deck->draw());
 		player->addToHand(this->deck->draw());
 		cout << "The following cards have been added to their hand: " << endl;
-		player->getHand().showHand();
+		player->getHand()->showHand();
 		cout << endl;
+	}
+}
+
+void GameEngine::mainGameLoop() {
+	//If the no one has won the game, continue the main game loop.
+	while (dynamic_cast<StateWin*>(currentState) == nullptr) {
+		//Begin each cycle of the main game loop with the reinforcement phase.
+		this->reinforcementPhase();
+		this->changeState("issueorder");
+		//Now, for each player, in order, allow them them to issue orders.
+		this->issueOrdersPhase();
+		//Once all the orders have been issued, execute them in round robin fashion.
+		this->executeOrdersPhase();
+		//Verify that each player controls at least one territory, if not, remove them from the game.
+		for (int i = 0; i < this->players.size(); i++) {
+			if (this->players[i]->getTerritoryList().size() < 1) {
+				this->players.erase(this->players.begin() + i);
+			}
+		}
+	}
+}
+
+void GameEngine::reinforcementPhase() {
+	double basicReinforcement;
+	double controlBonus;
+	double totalArmiesAdded;
+	//For each player, add their respective number of armies based on territories owned.
+	cout << "This is the reinforcement phase and the player will be given a number of armies\n" << endl;
+	for (Player* player : this->players) {
+		basicReinforcement = floor(player->getTerritoryList().size() / 3);
+		controlBonus = 0;
+		if (basicReinforcement < 3) {
+			basicReinforcement = 3;
+		}
+		//Go through each continent, and verify whether they earn bonus for controlling all its territories.
+		vector<Continents> continents = this->mapLoader->getContinentsFromMapFile();
+		for (Continents continent : continents) {
+			if (this->mapLoader->bonusContinent(continent, player->getTerritoryList())) {
+				//Add bonuc based on constant value.
+				controlBonus += 2;
+			}
+		}
+		totalArmiesAdded = basicReinforcement + controlBonus;
+		cout << "For player: " + player->getName() << endl;
+		cout << "Player's control bonus = " << controlBonus << endl;
+		cout << "Player's basic reinforcement = " << basicReinforcement << endl;;
+		cout << "The player will now receive " << totalArmiesAdded << " armies" << endl;;
+		player->addArmies(totalArmiesAdded);
+		player->armiesUsed = 0;
+	}
+}
+
+void GameEngine::issueOrdersPhase() {
+	int playesOrdersDone = 0;
+	string endDecision = "end";
+	string decision;
+	//Iterate in round robin fashion issue order phase until all players are don issuing orders.
+	while (playesOrdersDone < this->players.size()) {
+		playesOrdersDone = 0;
+		for (Player* player : this->players) {
+			cout << "\nPlayer: " << player->getName() << ", conitnue issuing orders? Type " << endDecision << " to stop: " << endl;
+			cin >> decision;
+			if (decision != endDecision) {
+				player->issueOrder(this->deck, this->players, this->mapLoader->getMap());
+			}
+			else {
+				//If that player no longer has orders to execute, count them as done.
+				playesOrdersDone++;
+			}
+		}
+	}
+	this->changeState("endissueorders");
+}
+
+void GameEngine::executeOrdersPhase() {
+	int playesOrdersDone = 0;
+	//Reset number of players done every iteration, keep iterating until all players are done.
+	while (playesOrdersDone < this->players.size()) {
+		playesOrdersDone = 0;
+		for (Player* player : this->players) {
+			if (player->getOrderList()->getList().size() > 0) {
+				//If it is not empty, get the front element.
+				Order* order = player->getOrderList()->getList()[0];
+				//Since the order list is like a queue, remove the first element, and then execute it
+				player->getOrderList()->remove(0);
+				order->execute();
+			}
+			else {
+				//If that player no longer has orders to execute, count them as done.
+				playesOrdersDone++;
+			}
+		}
+	}
+	this->changeState("endexecorders");
+}
+
+void GameEngine::endPhase() {
+	string input;
+	bool validCommand = false;
+	cout << "Would you like to continue playing? Enter \"end\" to stop." << endl;
+	//Loop until the user enters a command to end or restart during the win phase.
+	while (!validCommand) {
+		input = this->commandProcessor->getCommand().getCommandName();
+		//Validate the command and change state if possible.
+		validCommand = this->commandProcessor->validate(this->getStateName());
+		this->changeState(input);
+		if (validCommand && dynamic_cast<StateStart*>(this->currentState) != nullptr) {
+			this->isPlaying = true;
+		}
+		else if (validCommand){
+			this->isPlaying = false;
+		}
 	}
 }
 
@@ -440,15 +626,6 @@ ostream& operator<<(ostream& output, const GameEngine& engine) {
 istream& operator>>(istream& input, GameEngine& engine) {
 	string command;
 	input >> command;
-	engine.ChangeState(command);
+	engine.changeState(command);
 	return input;
-}
-
-void GameEngine::CommandSplit(string command, string values[], const int num) {
-	stringstream stream(command);
-	string s;
-	for (int i = 0; i < num; i++) {
-		getline(stream, s, ' ');
-		values[i] = s;
-	}
 }
