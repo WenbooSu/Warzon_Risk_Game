@@ -595,6 +595,23 @@ void GameEngine::executeOrdersPhase() {
 	this->changeState("endexecorders");
 }
 
+void GameEngine::executeTournament(Tournament* t)
+{
+	//Tournament(vector<string> mapArray, vector<string> playerStrategies, int numOfGames, int maxNumOfTurns)
+	for (auto& value : t->mapArray) //Play games for each map
+	{
+		for (int i = 0; i < t->numOfGames; i++) //Load and play each game
+		{
+			//Loading up a game engine
+			GameEngine* gameEngine = new GameEngine();
+			CommandProcessor* cmdProcessor = gameEngine->getCommandProcessor();
+
+			//Load and validate a map
+			cmdProcessor->
+		}
+	}
+}
+
 void GameEngine::endPhase() {
 	string input;
 	bool validCommand = false;
@@ -628,4 +645,43 @@ istream& operator>>(istream& input, GameEngine& engine) {
 	input >> command;
 	engine.changeState(command);
 	return input;
+}
+
+/*******************************
+	   Tournament State
+*******************************/
+
+Tournament::Tournament(vector<string> mapArray, vector<string> playerStrategies, int numOfGames, int maxNumOfTurns)
+{
+	this->mapArray = mapArray;
+	this->playerStrategies = playerStrategies;
+	this->numOfGames = numOfGames;
+	this->maxNumOfTurns = maxNumOfTurns;
+}
+
+Tournament::Tournament(const Tournament& tournament)
+{
+	this->mapArray = tournament.mapArray;
+	this->playerStrategies = tournament.playerStrategies;
+	this->numOfGames = tournament.numOfGames;
+	this->maxNumOfTurns = tournament.maxNumOfTurns;
+}
+
+Tournament& Tournament::operator=(const Tournament& tournament)
+{
+	this->mapArray = tournament.mapArray;
+	this->playerStrategies = tournament.playerStrategies;
+	this->numOfGames = tournament.numOfGames;
+	this->maxNumOfTurns = tournament.maxNumOfTurns;
+
+	return *this;
+}
+
+Tournament::~Tournament()
+{
+}
+
+ostream& operator<<(ostream& out, const Tournament& t)
+{
+	return out << "Tournament mode containing: " << t.mapArray.size() << "maps, " << t.playerStrategies.size() << "player strategies, " << t.numOfGames << "number of games, " << t.maxNumOfTurns << " number of turns for each game." << endl;
 }
